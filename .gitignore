@@ -1,2 +1,2 @@
-connect4-server/src/test/
-connect4-client/src/test/
+connect4-server/target/
+connect4-client/target/
