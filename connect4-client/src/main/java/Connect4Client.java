@@ -1,16 +1,8 @@
-import javafx.animation.FadeTransition;
-import javafx.animation.PauseTransition;
-import javafx.animation.RotateTransition;
-import javafx.animation.SequentialTransition;
 import javafx.application.Application;
-
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
-import javafx.util.Duration;
+import javafx.stage.*;
+import javafx.scene.layout.*;
+import javafx.scene.control.*;
 
 public class Connect4Client extends Application {
 
@@ -24,39 +16,39 @@ public class Connect4Client extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		// TODO Auto-generated method stub
-		primaryStage.setTitle("Welcome to Project #2");
 		
-				
+		//Create notifcation text fields for player to know what's going on
+		// Create section for text alerts
+		Label playerTurnLbl = new Label("Bruh Move: ");
+		TextField playerTurn = new TextField();
+		Label moveInfoLbl = new Label("Notifications Bruh: ");
+		TextField moveInfo = new TextField();
+		HBox notificationsBox = new HBox();
+		notificationsBox.getChildren().addAll(playerTurnLbl, playerTurn, moveInfoLbl, moveInfo);
 		
 		
-		 Rectangle rect = new Rectangle (100, 40, 100, 100);
-	     rect.setArcHeight(50);
-	     rect.setArcWidth(50);
-	     rect.setFill(Color.VIOLET);
+		
+		// Create gameboard and all the spots for it
+		GridPane connect4Board = new GridPane();
+		connect4Board.setGridLinesVisible(true);
+		for (int i = 0; i < 6; i++){
+			for (int j = 0; j < 7; j++){
+				Button button = new Button(i + " " + j);
+				connect4Board.add(button, j, i);
+			}
+		}
+		
+		
+		
+		// Combine gameboard with notification panel
+		VBox game = new VBox();
+		game.getChildren().addAll(notificationsBox, connect4Board);
+		
 
-	     RotateTransition rt = new RotateTransition(Duration.millis(5000), rect);
-	     rt.setByAngle(270);
-	     rt.setCycleCount(4);
-	     rt.setAutoReverse(true);
-	     SequentialTransition seqTransition = new SequentialTransition (
-	         new PauseTransition(Duration.millis(500)),
-	         rt
-	     );
-	     seqTransition.play();
-	     
-	     FadeTransition ft = new FadeTransition(Duration.millis(5000), rect);
-	     ft.setFromValue(1.0);
-	     ft.setToValue(0.3);
-	     ft.setCycleCount(4);
-	     ft.setAutoReverse(true);
-
-	     ft.play();
-	     BorderPane root = new BorderPane();
-	     root.setCenter(rect);
-	     
-	     Scene scene = new Scene(root, 700,700);
-			primaryStage.setScene(scene);
-			primaryStage.show();
+		Scene scene = new Scene(game, 700,600);
+		primaryStage.setTitle("Connect 4: Bruh Edition");
+		primaryStage.setScene(scene);
+		primaryStage.show();
 	}
 
 }
