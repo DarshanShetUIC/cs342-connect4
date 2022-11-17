@@ -3,12 +3,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.*;
+import javafx.geometry.*;
 
 public class Connect4Server extends Application {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		launch(args);	
+		launch(args);
 	}
 
 	//feel free to remove the starter code from this method
@@ -19,6 +20,7 @@ public class Connect4Server extends Application {
 		portSpinner.setEditable(true);
 		Button serverOnButton = new Button("Turn On Server");
 		HBox serverControls = new HBox();
+		serverControls.setAlignment(Pos.CENTER);
 		serverControls.getChildren().addAll(portSpinner, serverOnButton);
 		
 		
@@ -26,7 +28,7 @@ public class Connect4Server extends Application {
 		VBox serverPanel = new VBox();
 		serverPanel.getChildren().addAll(serverControls,notificationPanel);
 		
-		Scene scene = new Scene(serverPanel, 700,700);
+		Scene scene = new Scene(serverPanel, 700,400);
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Welcome to Connect 4");
 		primaryStage.show();
