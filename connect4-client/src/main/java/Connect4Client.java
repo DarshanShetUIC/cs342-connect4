@@ -6,13 +6,15 @@ import javafx.scene.control.*;
 import javafx.geometry.*;
 
 public class Connect4Client extends Application {
-
+	
+	
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		launch(args);
 		
 	}
-
+	
 	//feel free to remove the starter code from this method
 	@Override
 	public void start(Stage primaryStage) throws Exception {
