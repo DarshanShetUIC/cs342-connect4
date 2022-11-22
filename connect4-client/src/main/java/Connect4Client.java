@@ -69,6 +69,7 @@ public class Connect4Client extends Application {
 		connect4Board.getChildren().get(0).requestFocus();
 		primaryStage.setTitle("Connect 4: Bruh Edition");
 		primaryStage.setScene(scene);
+		primaryStage.setResizable(false);
 		primaryStage.show();
 	}
 
