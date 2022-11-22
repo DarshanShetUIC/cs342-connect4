@@ -15,6 +15,21 @@ public class Connect4Client extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+	
+		// Welcome screen for client
+		Spinner portSpinner = new Spinner(1024,49151,5555);
+		portSpinner.setEditable(true);
+		Label portInfoLbl = new Label("Port:");
+		portInfoLbl.setStyle("-fx-text-fill: #ffffff;");
+		Button connectToServer = new Button("Connect");
+		HBox portBox = new HBox();
+		portBox.setAlignment(Pos.CENTER);
+		portBox.setSpacing(5);
+		portBox.getChildren().addAll(portInfoLbl, portSpinner, connectToServer);
+		portBox.setStyle("-fx-background-image: url(\"/images/background.jpg\");");
+		Scene welcomeScreen = new Scene(portBox, 555, 520);
+		
+		
 		
 		// Player turn and notification status panel with controls defined and styled
 		Label playerTurnLbl = new Label("Player Turn: ");
@@ -39,7 +54,6 @@ public class Connect4Client extends Application {
 		HBox notificationsBox = new HBox();
 		notificationsBox.setPadding(new Insets(10,10,10,10));
 		notificationsBox.getChildren().addAll(playerTurnLblBox, playerTurn, spacer, moveLblBox, moveInfo);
-		
 		// Create gameboard and buttons for it
 		GridPane connect4Board = new GridPane();
 		connect4Board.setPadding(new Insets(10,10,10,10));
@@ -54,20 +68,28 @@ public class Connect4Client extends Application {
 				connect4Board.add(button, j, i);
 			}
 		}
-		
-		
 		// Combine gameboard with notification panel
 		VBox game = new VBox();
 		game.setStyle("-fx-background-image: url(\"/images/background.jpg\");");
 		game.getChildren().addAll(notificationsBox, connect4Board);
-		Scene scene = new Scene(game, 555, 520);
+		Scene gameScene = new Scene(game, 555, 520);
 		connect4Board.getChildren().get(35).requestFocus();
-
 		
+		
+		
+		primaryStage.setScene(welcomeScreen);
 		primaryStage.setTitle("Connect 4: Halo Edition");
-		primaryStage.setScene(scene);
 		primaryStage.setResizable(false);
 		primaryStage.show();
+		
+		
+		
+		connectToServer.setOnAction(new EventHandler<ActionEvent>(){
+			@Override public void handle(ActionEvent e){
+				primaryStage.setScene(gameScene);
+				primaryStage.show();
+			}
+		});
 	}
 
 }
