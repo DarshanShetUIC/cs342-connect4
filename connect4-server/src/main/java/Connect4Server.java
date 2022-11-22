@@ -31,13 +31,15 @@ public class Connect4Server extends Application {
 		//notificationPanel.getItems().add("A");
 		Button serverOffButton = new Button("Turn Off Server");
 		VBox serverPanel = new VBox();
+		serverPanel.setPadding(new Insets(10,10,10,10));
 		serverPanel.setAlignment(Pos.CENTER);
+		serverPanel.setSpacing(10);
 		serverPanel.getChildren().addAll(serverOffButton, notificationPanel);
 		Scene notificationScene = new Scene(serverPanel, 700,400);
 		
 		// Show the intro screen first
 		primaryStage.setScene(serverControlsScene);
-		primaryStage.setTitle("Connect 4 : Halo Server");
+		primaryStage.setTitle("Connect 4: Halo Server");
 		primaryStage.show();
 		
 		serverOnButton.setOnAction(new EventHandler<ActionEvent>(){
