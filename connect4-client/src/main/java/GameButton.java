@@ -4,9 +4,9 @@ import javafx.scene.image.ImageView;
 
 public class GameButton extends Button{
 	
-	String buttonImage1;
-	String buttonImage2;
-	String buttonImage0;
+	String buttonImage0 = "/images/none.png";
+	String buttonImage1 = "/images/blue.png";
+	String buttonImage2 = "/images/red.png";
 	Image img1;
 	Image img2;
 	Image img0;
@@ -15,10 +15,12 @@ public class GameButton extends Button{
 	int c;
 	
 	public GameButton(int row, int col, int player){
+		img0 = new Image(getClass().getResourceAsStream(buttonImage0));
 		img1 = new Image(getClass().getResourceAsStream(buttonImage1));
 		img2 = new Image(getClass().getResourceAsStream(buttonImage2));
-		img0 = new Image(getClass().getResourceAsStream(buttonImage0));
-		player = 0; r = row; c = col;
+		r = row;
+		c = col;
+		setPlayer(player);
 	}
 	
 	public void setPlayer(int player){
