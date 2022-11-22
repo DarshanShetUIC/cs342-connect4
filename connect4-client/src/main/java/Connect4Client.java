@@ -65,6 +65,13 @@ public class Connect4Client extends Application {
 				GameButton button = new GameButton(i, j, 0);
 				button.setPadding(Insets.EMPTY);
 				button.setStyle("-fx-shadow-highlight-color: transparent;");
+				
+				button.setOnAction(new EventHandler<ActionEvent>(){
+					@Override public void handle(ActionEvent e){
+						System.out.println("Button RC: " + button.r + button.c);
+					}
+				});
+				
 				connect4Board.add(button, j, i);
 			}
 		}
