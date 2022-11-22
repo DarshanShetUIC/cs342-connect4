@@ -1,9 +1,10 @@
-import javafx.application.Application;
+import javafx.application.*;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.*;
 import javafx.geometry.*;
+import javafx.event.*;
 
 public class Connect4Server extends Application {
 
@@ -12,25 +13,45 @@ public class Connect4Server extends Application {
 		launch(args);
 	}
 
-	//feel free to remove the starter code from this method
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		// TODO Auto-generated method stub
+		// An intro screen that allows the user to input the port number and start the server
 		Spinner portSpinner = new Spinner(1024,49151,5555);
 		portSpinner.setEditable(true);
 		Button serverOnButton = new Button("Turn On Server");
 		HBox serverControls = new HBox();
+		serverControls.setSpacing(10);
+		serverControls.setPadding(new Insets(10,10,10,10));
 		serverControls.setAlignment(Pos.CENTER);
 		serverControls.getChildren().addAll(portSpinner, serverOnButton);
+		Scene serverControlsScene = new Scene(serverControls, 325,50);
 		
-		
-		TextArea notificationPanel = new TextArea();
+		// A screen that displays the state of the game information with a button to turn off the server
+		ListView<String> notificationPanel = new ListView<String>();
+		//notificationPanel.getItems().add("A");
+		Button serverOffButton = new Button("Turn Off Server");
 		VBox serverPanel = new VBox();
-		serverPanel.getChildren().addAll(serverControls,notificationPanel);
+		serverPanel.setAlignment(Pos.CENTER);
+		serverPanel.getChildren().addAll(serverOffButton, notificationPanel);
+		Scene notificationScene = new Scene(serverPanel, 700,400);
 		
-		Scene scene = new Scene(serverPanel, 700,400);
-		primaryStage.setScene(scene);
-		primaryStage.setTitle("Welcome to Connect 4");
+		// Show the intro screen first
+		primaryStage.setScene(serverControlsScene);
+		primaryStage.setTitle("Connect 4 : Halo Server");
 		primaryStage.show();
+		
+		serverOnButton.setOnAction(new EventHandler<ActionEvent>(){
+			@Override public void handle(ActionEvent e){
+				primaryStage.setScene(notificationScene);
+				primaryStage.show();
+			}
+		});
+		
+		serverOffButton.setOnAction(new EventHandler<ActionEvent>(){
+			@Override public void handle(ActionEvent e){
+				Platform.exit();
+				System.exit(0);
+			}
+		});
 	}
 }
