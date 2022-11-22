@@ -8,11 +8,12 @@ import java.util.ArrayList;
 public class Server{
 	int count = 1;
 	ArrayList<ClientInstance> clients = new ArrayList<ClientInstance>();
-	
+	int port;
 	ServerInstance server;
 	
-	public Server(){
+	public Server(int input_port){
 		server = new ServerInstance();
+		port = input_port;
 		server.start(); 
 	}
 	
