@@ -11,11 +11,15 @@ public class Client extends Thread{
 	ObjectOutputStream out;
 	ObjectInputStream in;
 	
+	String IP_Address;
+	int port;
 	CFourInfo data;
 	
-	public Client(){
+	public Client(String addy, int input_port){
 		data = new CFourInfo();
-		data.gameStatus = ("Everything is awesome!");
+		IP_Address = addy;
+		port = input_port;
+		data.gameStatus = ("Made a move, waiting on other player...");
 		//Random rand = new Random();
 		// data.setVal(rand.nextInt(50));
 	}
