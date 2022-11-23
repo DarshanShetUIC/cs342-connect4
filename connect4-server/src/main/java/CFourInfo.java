@@ -1,9 +1,4 @@
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.net.Socket;
-import java.util.function.Consumer;
 
 public class CFourInfo implements Serializable{
 	// Message to be displayed about P1's move
@@ -19,6 +14,9 @@ public class CFourInfo implements Serializable{
 	// 1 for P1 coin
 	// 2 for P2 coin
 	int boardMatrix[][];
+	// remember last move
+	int lastChangedRow;
+	int lastChangedCol;
 	
 	public CFourInfo(){
 		gameStatus = "";
@@ -26,5 +24,11 @@ public class CFourInfo implements Serializable{
 		playerTurn = 0;
 		gameInProgress = false;
 		boardMatrix = new int[6][7];
+	}
+	
+	public void updateBoardMatrix(int row, int col, int coin){
+		boardMatrix[row][col] = coin;
+		lastChangedRow = row;
+		lastChangedCol = col;
 	}
 }
