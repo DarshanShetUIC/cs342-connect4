@@ -5,8 +5,8 @@ import java.io.ObjectOutputStream;
 import java.lang.Thread;
 import java.util.Random;
 
-
 public class Client extends Thread{
+	
 	Socket socket;
 	ObjectOutputStream out;
 	ObjectInputStream in;
@@ -15,19 +15,22 @@ public class Client extends Thread{
 	int port;
 	CFourInfo data;
 	
-	public Client(String addy, int input_port){
-		data = new CFourInfo();
+	private Consumer<CFourInfo> callback;
+	
+	public Client(Consumer<CFourInfo> call){
+		callback = call;
+	}
+	
+	public void configureClient(String addy, int input_port){
 		IP_Address = addy;
 		port = input_port;
-		data.gameStatus = ("Made a move, waiting on other player...");
-		//Random rand = new Random();
-		// data.setVal(rand.nextInt(50));
+		data = new CFourInfo();
 	}
 	
 	public void run(){
 		try{
 			// TODO: first parameter is IP address entered, and second is port # entered
-			socket = new Socket("127.0.0.1",5555);
+			socket = new Socket(IP_Address, port);
 			out = new ObjectOutputStream(socket.getOutputStream());
 			in = new ObjectInputStream(socket.getInputStream());
 			socket.setTcpNoDelay(true);
