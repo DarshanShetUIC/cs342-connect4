@@ -98,5 +98,4 @@ public class Connect4Client extends Application {
 			}
 		});
 	}
-
 }

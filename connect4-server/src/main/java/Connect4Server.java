@@ -32,10 +32,11 @@ public class Connect4Server extends Application {
 		Button serverOffButton = new Button("Turn Off Server");
 		VBox serverPanel = new VBox();
 		serverPanel.setPadding(new Insets(10,10,10,10));
-		serverPanel.setAlignment(Pos.CENTER);
+		serverPanel.setAlignment(Pos.TOP_CENTER);
 		serverPanel.setSpacing(10);
 		serverPanel.getChildren().addAll(serverOffButton, notificationPanel);
-		Scene notificationScene = new Scene(serverPanel, 700,400);
+		serverPanel.setStyle("-fx-background-image: url(\"/images/background.jpg\");");
+		Scene notificationScene = new Scene(serverPanel, 555, 520);
 		
 		// Show the intro screen first
 		primaryStage.setScene(serverControlsScene);
