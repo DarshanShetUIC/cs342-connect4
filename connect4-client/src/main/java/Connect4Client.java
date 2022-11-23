@@ -30,8 +30,9 @@ public class Connect4Client extends Application {
 		Scene welcomeScreen = new Scene(portBox, 555, 520);
 		
 		
-		
-		// Player turn and notification status panel with controls defined and styled
+		// Create client, later to be called
+		Client client;
+		// Player turn and notification status panel with controls defined and styled, also create client for referencing
 		Label playerTurnLbl = new Label("Player Turn: ");
 		playerTurnLbl.setStyle("-fx-text-fill: #ffffff;");
 		VBox playerTurnLblBox = new VBox();
@@ -68,10 +69,13 @@ public class Connect4Client extends Application {
 				
 				button.setOnAction(new EventHandler<ActionEvent>(){
 					@Override public void handle(ActionEvent e){
-						System.out.println("Button RC: " + button.r + button.c);
+						// TODO: Update client's internal CFourInfo data object and then send to server
+						// Layman's terms:
+						// When a player presses a valid button on the game board,
+						// update the game board matrix, then update the game status.
+						// Send that info over to the server to process
 					}
 				});
-				
 				connect4Board.add(button, j, i);
 			}
 		}
@@ -95,6 +99,17 @@ public class Connect4Client extends Application {
 			@Override public void handle(ActionEvent e){
 				primaryStage.setScene(gameScene);
 				primaryStage.show();
+				
+				// Create client that communicates with server
+				client = new Client(data -> {
+					Platform.runLater(() -> {
+						for (int i = 0; i < 6; i++){
+							for (int j = 0; j < 7; j++){
+								// TODO: update client's game board with values received from server
+							}
+						}
+					});
+				});
 			}
 		});
 	}

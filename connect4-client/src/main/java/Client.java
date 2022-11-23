@@ -29,7 +29,6 @@ public class Client extends Thread{
 	
 	public void run(){
 		try{
-			// TODO: first parameter is IP address entered, and second is port # entered
 			socket = new Socket(IP_Address, port);
 			out = new ObjectOutputStream(socket.getOutputStream());
 			in = new ObjectInputStream(socket.getInputStream());
@@ -37,9 +36,8 @@ public class Client extends Thread{
 			
 			while(true){
 				CFourInfo temp = (CFourInfo) in.readObject();
-				// TODO: 
-				//this is where we update game board
-				System.out.println(temp.gameStatus + " ");
+				callback.accept(temp);
+				data = temp;
 			}
 		}
 		catch(Exception e){
@@ -48,10 +46,10 @@ public class Client extends Thread{
 		}
 	}
 	
-	public void send(){  // send a move onto the board
+	public void send(){
+		// send a move onto the board
 		try{
 			out.writeObject(data);
-			// TODO: send moves to server for other player to see
 		}
 		catch(Exception e){
 			System.out.println("[Client] Could not send data...");

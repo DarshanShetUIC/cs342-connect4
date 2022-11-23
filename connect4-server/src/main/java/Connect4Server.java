@@ -9,12 +9,16 @@ import javafx.event.*;
 public class Connect4Server extends Application {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		launch(args);
 	}
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+	
+		// Remember port from intro screen for future
+		int port = 5555;
+		Server server;
+	
 		// An intro screen that allows the user to input the port number and start the server
 		Spinner portSpinner = new Spinner(1024,49151,5555);
 		portSpinner.setEditable(true);
@@ -28,7 +32,6 @@ public class Connect4Server extends Application {
 		
 		// A screen that displays the state of the game information with a button to turn off the server
 		ListView<String> notificationPanel = new ListView<String>();
-		//notificationPanel.getItems().add("A");
 		Button serverOffButton = new Button("Turn Off Server");
 		VBox serverPanel = new VBox();
 		serverPanel.setPadding(new Insets(10,10,10,10));
@@ -45,6 +48,16 @@ public class Connect4Server extends Application {
 		
 		serverOnButton.setOnAction(new EventHandler<ActionEvent>(){
 			@Override public void handle(ActionEvent e){
+				// Get the port from the value entered by user
+				port = portSpinner.getValue().parseInt();
+				// Create the server with that port
+				server = new Server(data -> {
+					// Using callback feature, whenever the server gets a response
+					// from any player, add the game status to notifications
+					Platform.runLater(() -> {
+						notificationPanel.getItems().add(data.gameStatus);
+					});
+				});
 				primaryStage.setScene(notificationScene);
 				primaryStage.show();
 			}

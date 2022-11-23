@@ -6,30 +6,42 @@ import java.lang.Thread;
 import java.util.ArrayList;
 
 public class Server{
+	
 	int count = 1;
 	ArrayList<ClientInstance> clients = new ArrayList<ClientInstance>();
+	
 	int port;
 	ServerInstance server;
 	
-	public Server(int input_port){
-		server = new ServerInstance();
+	CFourInfo data;
+	
+	private Consumer<CFourInfo> callback;
+	
+	public Server(Consumer<CFourInfo> call){
+		callback = call;
+	}
+	
+	public createServerInstance(int input_port){
 		port = input_port;
-		server.start(); 
+		data = new CFourInfo();
+		server = new ServerInstance();
+		server.start();
 	}
 	
 	public class ServerInstance extends Thread{
 		public void run() {
 			try{
-				// TODO: getText of Port # text box
-				ServerSocket mysocket = new ServerSocket(5555);
-				System.out.println("Server is waiting for a client!");
+				// Create socket for players to connect to server
+				ServerSocket mysocket = new ServerSocket(port);
+				System.out.println("Server waiting for P1 and P2...");
+				data.gameStatus = "Server waiting for P1 and P2...";
+				callback.accept(data);
 				
 				while(true){
 					ClientInstance c = new ClientInstance(mysocket.accept(), count);
 					System.out.println("[Server] New client has joined the server");
 					clients.add(c);
 					c.start();
-					// start user interface
 					count++;
 				}
 			}
@@ -77,8 +89,8 @@ public class Server{
 			while(true){
 				try{
 					CFourInfo data = (CFourInfo) in.readObject();
-					// TODO: check if the player who last moved won, make function that is
-					// supported by C4Logic
+					callback.accept(data);
+					// TODO: check if the player who last moved won, make function that is supported by C4Logic
 					updateClients(data);
 				}
 				catch(Exception e){
