@@ -4,6 +4,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.lang.Thread;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class Server{
 	
@@ -21,7 +22,7 @@ public class Server{
 		callback = call;
 	}
 	
-	public createServerInstance(int input_port){
+	public void createServerInstance(int input_port){
 		port = input_port;
 		data = new CFourInfo();
 		server = new ServerInstance();

@@ -4,6 +4,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.Thread;
 import java.util.Random;
+import java.util.function.Consumer;
 
 public class Client extends Thread{
 	

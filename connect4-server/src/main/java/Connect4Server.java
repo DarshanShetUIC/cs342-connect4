@@ -5,6 +5,7 @@ import javafx.scene.layout.*;
 import javafx.stage.*;
 import javafx.geometry.*;
 import javafx.event.*;
+import java.lang.Integer;
 
 public class Connect4Server extends Application {
 
@@ -49,7 +50,7 @@ public class Connect4Server extends Application {
 		serverOnButton.setOnAction(new EventHandler<ActionEvent>(){
 			@Override public void handle(ActionEvent e){
 				// Get the port from the value entered by user
-				port = portSpinner.getValue().parseInt();
+				port = Integer.parseInt(portSpinner.getValue());
 				// Create the server with that port
 				server = new Server(data -> {
 					// Using callback feature, whenever the server gets a response
@@ -58,6 +59,7 @@ public class Connect4Server extends Application {
 						notificationPanel.getItems().add(data.gameStatus);
 					});
 				});
+				server.createServerInstance(port);
 				primaryStage.setScene(notificationScene);
 				primaryStage.show();
 			}
