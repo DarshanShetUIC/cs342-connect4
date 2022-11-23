@@ -71,4 +71,10 @@ public class Connect4Server extends Application {
 			}
 		});
 	}
+	
+	@Override
+	public void stop(){
+		Platform.exit();
+		System.exit(0);
+	}
 }

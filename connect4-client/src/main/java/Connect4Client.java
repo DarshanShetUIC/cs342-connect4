@@ -112,4 +112,10 @@ public class Connect4Client extends Application {
 			}
 		});
 	}
+	
+	@Override
+	public void stop(){
+		Platform.exit();
+		System.exit(0);
+	}
 }
