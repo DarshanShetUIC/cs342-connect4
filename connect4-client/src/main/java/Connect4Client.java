@@ -29,9 +29,6 @@ public class Connect4Client extends Application {
 		portBox.setStyle("-fx-background-image: url(\"/images/background.jpg\");");
 		Scene welcomeScreen = new Scene(portBox, 555, 520);
 		
-		
-		// Create client, later to be called
-		Client client;
 		// Player turn and notification status panel with controls defined and styled, also create client for referencing
 		Label playerTurnLbl = new Label("Player Turn: ");
 		playerTurnLbl.setStyle("-fx-text-fill: #ffffff;");
@@ -101,7 +98,7 @@ public class Connect4Client extends Application {
 				primaryStage.show();
 				
 				// Create client that communicates with server
-				client = new Client(data -> {
+				Client client = new Client(data -> {
 					Platform.runLater(() -> {
 						for (int i = 0; i < 6; i++){
 							for (int j = 0; j < 7; j++){
