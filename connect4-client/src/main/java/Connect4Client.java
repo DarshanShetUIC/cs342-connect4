@@ -9,6 +9,8 @@ import javafx.scene.image.*;
 
 public class Connect4Client extends Application {
 	
+	Client client;
+	
 	public static void main(String[] args) {
 		launch(args);
 	}
@@ -98,7 +100,7 @@ public class Connect4Client extends Application {
 				primaryStage.show();
 				
 				// Create client that communicates with server
-				Client client = new Client(data -> {
+				client = new Client(data -> {
 					Platform.runLater(() -> {
 						for (int i = 0; i < 6; i++){
 							for (int j = 0; j < 7; j++){
