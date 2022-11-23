@@ -14,6 +14,9 @@ public class CFourInfo implements Serializable{
 	// 1 for P1 coin
 	// 2 for P2 coin
 	int boardMatrix[][];
+	// remember last move
+	int lastChangedRow;
+	int lastChangedCol;
 	
 	public CFourInfo(){
 		gameStatus = "";
@@ -25,5 +28,7 @@ public class CFourInfo implements Serializable{
 	
 	public void updateBoardMatrix(int row, int col, int coin){
 		boardMatrix[row][col] = coin;
+		lastChangedRow = row;
+		lastChangedCol = col;
 	}
 }
