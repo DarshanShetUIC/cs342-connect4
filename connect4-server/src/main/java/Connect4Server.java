@@ -9,6 +9,9 @@ import java.lang.Integer;
 
 public class Connect4Server extends Application {
 
+	int port = 5555;
+	Server server;
+
 	public static void main(String[] args) {
 		launch(args);
 	}
@@ -16,12 +19,8 @@ public class Connect4Server extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 	
-		// Remember port from intro screen for future
-		int port = 5555;
-		Server server;
-	
 		// An intro screen that allows the user to input the port number and start the server
-		Spinner portSpinner = new Spinner(1024,49151,5555);
+		Spinner<Integer> portSpinner = new Spinner<Integer>(1024,49151,5555);
 		portSpinner.setEditable(true);
 		Button serverOnButton = new Button("Turn On Server");
 		HBox serverControls = new HBox();
@@ -50,7 +49,7 @@ public class Connect4Server extends Application {
 		serverOnButton.setOnAction(new EventHandler<ActionEvent>(){
 			@Override public void handle(ActionEvent e){
 				// Get the port from the value entered by user
-				port = Integer.parseInt(portSpinner.getValue());
+				port = portSpinner.getValue();
 				// Create the server with that port
 				server = new Server(data -> {
 					// Using callback feature, whenever the server gets a response
