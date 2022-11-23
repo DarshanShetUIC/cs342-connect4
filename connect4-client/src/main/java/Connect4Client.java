@@ -19,17 +19,31 @@ public class Connect4Client extends Application {
 	public void start(Stage primaryStage) throws Exception {
 	
 		// Welcome screen for client
-		Spinner portSpinner = new Spinner(1024,49151,5555);
+		Spinner<Integer> portSpinner = new Spinner<Integer>(1024,49151,5555);
 		portSpinner.setEditable(true);
 		Label portInfoLbl = new Label("Port:");
 		portInfoLbl.setStyle("-fx-text-fill: #ffffff;");
-		Button connectToServer = new Button("Connect");
 		HBox portBox = new HBox();
 		portBox.setAlignment(Pos.CENTER);
 		portBox.setSpacing(5);
-		portBox.getChildren().addAll(portInfoLbl, portSpinner, connectToServer);
-		portBox.setStyle("-fx-background-image: url(\"/images/background.jpg\");");
-		Scene welcomeScreen = new Scene(portBox, 555, 520);
+		portBox.getChildren().addAll(portInfoLbl, portSpinner);
+		
+		TextField ipInput = new TextField();
+		Label ipInputLbl = new Label("   IP:");
+		ipInputLbl.setStyle("-fx-text-fill: #ffffff;");
+		HBox ipBox = new HBox();
+		ipBox.setAlignment(Pos.CENTER);
+		ipBox.setSpacing(5);
+		ipBox.getChildren().addAll(ipInputLbl, ipInput);
+		
+		Button connectToServer = new Button("Connect");
+		
+		VBox controlsBox = new VBox();
+		controlsBox.setAlignment(Pos.CENTER);
+		controlsBox.setSpacing(5);
+		controlsBox.getChildren().addAll(ipBox, portBox, connectToServer);
+		controlsBox.setStyle("-fx-background-image: url(\"/images/background.jpg\");");
+		Scene welcomeScreen = new Scene(controlsBox, 555, 520);
 		
 		// Player turn and notification status panel with controls defined and styled, also create client for referencing
 		Label playerTurnLbl = new Label("Player Turn: ");
@@ -101,6 +115,7 @@ public class Connect4Client extends Application {
 				
 				// Create client that communicates with server
 				client = new Client(data -> {
+					// When response received from server, update the game board
 					Platform.runLater(() -> {
 						for (int i = 0; i < 6; i++){
 							for (int j = 0; j < 7; j++){
@@ -109,6 +124,8 @@ public class Connect4Client extends Application {
 						}
 					});
 				});
+				client.configureClient(ipInput.getText(), portSpinner.getValue());
+				client.start();
 			}
 		});
 	}

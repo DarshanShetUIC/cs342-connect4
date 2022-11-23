@@ -26,6 +26,7 @@ public class Client extends Thread{
 		IP_Address = addy;
 		port = input_port;
 		data = new CFourInfo();
+		System.out.println("[Client] Client-->Server Connection: " + addy + ":" + input_port);
 	}
 	
 	public void run(){

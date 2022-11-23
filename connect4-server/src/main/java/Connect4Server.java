@@ -6,11 +6,15 @@ import javafx.stage.*;
 import javafx.geometry.*;
 import javafx.event.*;
 import java.lang.Integer;
+import javafx.scene.media.*;
+import javafx.util.Duration;
 
 public class Connect4Server extends Application {
 
 	int port = 5555;
 	Server server;
+	
+	MediaPlayer mediaPlayer;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -28,6 +32,7 @@ public class Connect4Server extends Application {
 		serverControls.setPadding(new Insets(10,10,10,10));
 		serverControls.setAlignment(Pos.CENTER);
 		serverControls.getChildren().addAll(portSpinner, serverOnButton);
+		serverControls.setStyle("-fx-background-image: url(\"/images/background.jpg\");");
 		Scene serverControlsScene = new Scene(serverControls, 325,50);
 		
 		// A screen that displays the state of the game information with a button to turn off the server
@@ -61,11 +66,19 @@ public class Connect4Server extends Application {
 				server.createServerInstance(port);
 				primaryStage.setScene(notificationScene);
 				primaryStage.show();
+				Media theme = new Media(getClass().getResource("/audio/halo.mp3").toExternalForm());
+				mediaPlayer = new MediaPlayer(theme);
+				mediaPlayer.play();
+				mediaPlayer.setOnEndOfMedia(() -> {
+					mediaPlayer.seek(Duration.ZERO);
+					mediaPlayer.play();
+				});
 			}
 		});
 		
 		serverOffButton.setOnAction(new EventHandler<ActionEvent>(){
 			@Override public void handle(ActionEvent e){
+				mediaPlayer.stop();
 				Platform.exit();
 				System.exit(0);
 			}
@@ -74,6 +87,7 @@ public class Connect4Server extends Application {
 	
 	@Override
 	public void stop(){
+		mediaPlayer.stop();
 		Platform.exit();
 		System.exit(0);
 	}

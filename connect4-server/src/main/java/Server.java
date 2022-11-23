@@ -89,8 +89,8 @@ public class Server{
 			
 			while(true){
 				try{
-					CFourInfo data = (CFourInfo) in.readObject();
-					callback.accept(data);
+					CFourInfo temp = (CFourInfo) in.readObject();
+					callback.accept(temp);
 					// TODO: check if the player who last moved won, make function that is supported by C4Logic
 					updateClients(data);
 				}
