@@ -5,10 +5,11 @@ import java.net.Socket;
 import java.lang.Thread;
 import java.util.ArrayList;
 import java.util.function.Consumer;
+import java.util.LinkedList;
 
 public class Server{
 	
-	int count = 1;
+	LinkedList<Integer> playerSlots = new LinkedList<Integer>();
 	ArrayList<ClientInstance> clients = new ArrayList<ClientInstance>();
 	
 	int port;
@@ -23,10 +24,21 @@ public class Server{
 	}
 	
 	public void createServerInstance(int input_port){
+		playerSlots.add(1);
+		playerSlots.add(2);
+		printPlayerSlots(playerSlots);
 		port = input_port;
 		data = new CFourInfo();
 		server = new ServerInstance();
 		server.start();
+	}
+	
+	public void printPlayerSlots(LinkedList<Integer> list){
+		System.out.print("Slots available: ");
+		for(Integer slot : list){
+			System.out.print(slot + " ");
+		}
+		System.out.println("");
 	}
 	
 	public class ServerInstance extends Thread{
@@ -37,13 +49,26 @@ public class Server{
 				System.out.println("Server waiting for P1 and P2...");
 				data.gameStatus = "Server waiting for P1 and P2...";
 				callback.accept(data);
-				
+				// Check if players joined game and allow them to connect. If full, quietly reject.
 				while(true){
-					ClientInstance c = new ClientInstance(mysocket.accept(), count);
-					System.out.println("[Server] New client has joined the server");
-					clients.add(c);
-					c.start();
-					count++;
+					if(playerSlots.size() != 0){
+						int newPlayerID = playerSlots.remove();
+						ClientInstance c = new ClientInstance(mysocket.accept(), newPlayerID, true);
+						System.out.println("[Server] P" + newPlayerID + " has joined the game...");
+						data.gameStatus = "P" + newPlayerID + " has joined the game...";
+						callback.accept(data);
+						clients.add(c);
+						c.start();
+					}
+					else{
+						// Since two players are currently playing
+						// Allow the other player to connect but reject it later on
+						ClientInstance c = new ClientInstance(mysocket.accept(), 0, false);
+						System.out.println("[Server] Another player connecting. Rejecting...");
+						data.gameStatus = "Another player connecting. Rejecting...";
+						callback.accept(data);
+						break;
+					}
 				}
 			}
 			catch(Exception e){
@@ -53,17 +78,18 @@ public class Server{
 	}
 	
 	public class ClientInstance extends Thread{
+		
 		Socket connection;
 		int count;
 		ObjectInputStream in;
 		ObjectOutputStream out;
+		boolean canJoin;
 		
-		ClientInstance(Socket s, int count){
+		ClientInstance(Socket s, int count, boolean joinable){
 			this.connection = s;
 			this.count = count;	
+			canJoin = joinable;
 		}
-		
-		
 		
 		public void updateClients(CFourInfo data){ // update the board, heavy changes
 			for(int i = 0; i < clients.size(); i++) {
@@ -82,21 +108,36 @@ public class Server{
 				in = new ObjectInputStream(connection.getInputStream());
 				out = new ObjectOutputStream(connection.getOutputStream());
 				connection.setTcpNoDelay(true);
+				// If server has two players already and a third one tries to join,
+				// connect with that third player but send it an info message
+				// stating server is full
+				if(!canJoin){
+					CFourInfo temp = new CFourInfo();
+					temp.gameStatus = "Server full...";
+					out.writeObject(temp);
+				}
+				// Let new player know what their ID is
+				data.gameStatus = "Your Player ID is " + count + ". Waiting for others to join...";
+				out.writeObject(data);
 			}
 			catch(Exception e){
 				System.out.println("[ClientThread] IO stream could not open...");
 			}
-			
 			while(true){
 				try{
 					CFourInfo temp = (CFourInfo) in.readObject();
 					callback.accept(temp);
-					// TODO: check if the player who last moved won, make function that is supported by C4Logic
+					// TODO: GAME LOGIC GOES HERE
 					updateClients(data);
 				}
 				catch(Exception e){
 					System.out.println("[ClientThread] A client has left the server");
 					clients.remove(this);
+					playerSlots.add(count);
+					printPlayerSlots(playerSlots);
+					data.gameStatus = "Error: P" + count + " has left the server...";
+					callback.accept(data);
+					updateClients(data);
 					break;
 				}
 			}

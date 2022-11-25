@@ -16,10 +16,17 @@ public class Client extends Thread{
 	int port;
 	CFourInfo data;
 	
+	int playerID;
+	
 	private Consumer<CFourInfo> callback;
 	
 	public Client(Consumer<CFourInfo> call){
 		callback = call;
+	}
+	
+	public void updatePlayerID(int id){
+		playerID = id;
+		System.out.println("[Client] Player ID set to: " + playerID);
 	}
 	
 	public void configureClient(String addy, int input_port){
@@ -30,16 +37,18 @@ public class Client extends Thread{
 	}
 	
 	public void run(){
+		// attempt to connect to server
 		try{
 			socket = new Socket(IP_Address, port);
 			out = new ObjectOutputStream(socket.getOutputStream());
 			in = new ObjectInputStream(socket.getInputStream());
 			socket.setTcpNoDelay(true);
-			
+			// read data from server and pass onto UI to update gameboard and other UI elements
 			while(true){
 				CFourInfo temp = (CFourInfo) in.readObject();
-				callback.accept(temp);
+				System.out.println("[Client] Server sent a data packet");
 				data = temp;
+				callback.accept(temp);
 			}
 		}
 		catch(Exception e){
@@ -49,7 +58,7 @@ public class Client extends Thread{
 	}
 	
 	public void send(){
-		// send a move onto the board
+		// send current board info to server / other player
 		try{
 			out.writeObject(data);
 		}

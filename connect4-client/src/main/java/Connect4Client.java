@@ -27,7 +27,6 @@ public class Connect4Client extends Application {
 		portBox.setAlignment(Pos.CENTER);
 		portBox.setSpacing(5);
 		portBox.getChildren().addAll(portInfoLbl, portSpinner);
-		
 		TextField ipInput = new TextField();
 		Label ipInputLbl = new Label("   IP:");
 		ipInputLbl.setStyle("-fx-text-fill: #ffffff;");
@@ -35,9 +34,7 @@ public class Connect4Client extends Application {
 		ipBox.setAlignment(Pos.CENTER);
 		ipBox.setSpacing(5);
 		ipBox.getChildren().addAll(ipInputLbl, ipInput);
-		
 		Button connectToServer = new Button("Connect");
-		
 		VBox controlsBox = new VBox();
 		controlsBox.setAlignment(Pos.CENTER);
 		controlsBox.setSpacing(5);
@@ -53,7 +50,6 @@ public class Connect4Client extends Application {
 		playerTurnLblBox.getChildren().addAll(playerTurnLbl);
 		TextField playerTurn = new TextField();
 		playerTurn.setPrefWidth(25);
-		playerTurn.setText("2");
 		playerTurn.setEditable(false);
 		Label spacer = new Label("     ");
 		Label moveInfoLbl = new Label("Status: ");
@@ -64,7 +60,6 @@ public class Connect4Client extends Application {
 		TextField moveInfo = new TextField();
 		moveInfo.setPrefWidth(352);
 		moveInfo.setEditable(false);
-		moveInfo.setText("Player one moved to 3,3. Player two, your turn.");
 		HBox notificationsBox = new HBox();
 		notificationsBox.setPadding(new Insets(10,10,10,10));
 		notificationsBox.getChildren().addAll(playerTurnLblBox, playerTurn, spacer, moveLblBox, moveInfo);
@@ -79,14 +74,19 @@ public class Connect4Client extends Application {
 				GameButton button = new GameButton(i, j, 0);
 				button.setPadding(Insets.EMPTY);
 				button.setStyle("-fx-shadow-highlight-color: transparent;");
-				
 				button.setOnAction(new EventHandler<ActionEvent>(){
-					@Override public void handle(ActionEvent e){
+					@Override
+					public void handle(ActionEvent e){
 						// TODO: Update client's internal CFourInfo data object and then send to server
 						// Layman's terms:
 						// When a player presses a valid button on the game board,
 						// update the game board matrix, then update the game status.
 						// Send that info over to the server to process
+						
+						client.data.setCoinOnGameBoard(button.r, button.c, client.playerID);
+						client.data.gameStatus = "Player " + client.playerID 
+							+ " made move at " + button.r + "," + button.c;
+						client.send();
 					}
 				});
 				connect4Board.add(button, j, i);
@@ -109,18 +109,52 @@ public class Connect4Client extends Application {
 		
 		
 		connectToServer.setOnAction(new EventHandler<ActionEvent>(){
-			@Override public void handle(ActionEvent e){
+			@Override
+			public void handle(ActionEvent e){
 				primaryStage.setScene(gameScene);
 				primaryStage.show();
-				
+
 				// Create client that communicates with server
 				client = new Client(data -> {
 					// When response received from server, update the game board
 					Platform.runLater(() -> {
-						for (int i = 0; i < 6; i++){
-							for (int j = 0; j < 7; j++){
-								// TODO: update client's game board with values received from server
+						// TODO: CLIENT SIDE GAME LOGIC
+						// Update client's game board with values received from server
+						// Also, enable or disable board depending on who is playing
+						
+						// Display message sent by server / other players
+						moveInfo.setText(data.gameStatus);
+						
+						// Set player id of client once client connects to server
+						// Server determines player's ID
+						if(data.gameStatus.substring(0,4).equals("Your")){
+							client.updatePlayerID(Integer.parseInt(data.gameStatus.substring(18, 19)));
+							for (int i = 0; i < 6; i++){
+								for (int j = 0; j < 7; j++){
+									//Button btn = (Button) connect4Board.getChildren().get(i*7+j);
+									//btn.setDisable(true);
+									connect4Board.getChildren().get(i*7+j).setDisable(true);
+								}
 							}
+						}
+						else{
+							System.out.println("[Connect4Client] Error setting player ID");
+						}
+						
+						// If other player has disconnected, disable player's board
+						// Server will send a message about this
+						if(data.gameStatus.substring(0,6).equals("Error:")){
+							for (int i = 0; i < 6; i++){
+								for (int j = 0; j < 7; j++){
+									connect4Board.getChildren().get(i*7+j).setDisable(true);
+								}
+							}
+						}
+						
+						// If server is full, exit because this is Player 3
+						if(data.gameStatus.substring(0,6).equals("Server")){
+							Platform.exit();
+							System.exit(0);
 						}
 					});
 				});

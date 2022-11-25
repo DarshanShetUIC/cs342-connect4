@@ -68,7 +68,7 @@ public class Connect4Server extends Application {
 				primaryStage.show();
 				Media theme = new Media(getClass().getResource("/audio/halo.mp3").toExternalForm());
 				mediaPlayer = new MediaPlayer(theme);
-				mediaPlayer.play();
+				//mediaPlayer.play();
 				mediaPlayer.setOnEndOfMedia(() -> {
 					mediaPlayer.seek(Duration.ZERO);
 					mediaPlayer.play();
