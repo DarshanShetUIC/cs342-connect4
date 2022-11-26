@@ -42,6 +42,25 @@ public class Connect4Client extends Application {
 		controlsBox.setStyle("-fx-background-image: url(\"/images/background.jpg\");");
 		Scene welcomeScreen = new Scene(controlsBox, 555, 520);
 		
+		// End of game scene
+		Label endOfGameLbl = new Label("Player [] won!");
+		endOfGameLbl.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 30");
+		Label blankLbl = new Label(" ");
+		blankLbl.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 30");
+		Button restartBtn = new Button("Restart");
+		Button quitBtn = new Button("Quit");
+		HBox endGameControlsBox = new HBox();
+		endGameControlsBox.setAlignment(Pos.CENTER);
+		endGameControlsBox.setSpacing(5);
+		endGameControlsBox.getChildren().addAll(restartBtn, quitBtn);
+		VBox endGameBox = new VBox();
+		endGameBox.setAlignment(Pos.CENTER);
+		endGameBox.setSpacing(5);
+		endGameBox.getChildren().addAll(endOfGameLbl, blankLbl, endGameControlsBox);
+		endGameBox.setStyle("-fx-background-image: url(\"/images/background.jpg\");");
+		Scene endGameScreen = new Scene(endGameBox, 555, 520);
+		
+		// Actual game scene defined below
 		// Player turn and notification status panel with controls defined and styled, also create client for referencing
 		Label playerTurnLbl = new Label("Player Turn: ");
 		playerTurnLbl.setStyle("-fx-text-fill: #ffffff;");
@@ -81,7 +100,10 @@ public class Connect4Client extends Application {
 						// Layman's terms:
 						// When a player presses a valid button on the game board,
 						// update the game board matrix, then update the game status.
-						// Send that info over to the server to process
+						// If the player wins the game logically, check for it,
+						// and mark the board, set the status.
+						// Send that info over to the server to pass on to other players
+						
 						
 						client.data.setCoinOnGameBoard(button.r, button.c, client.playerID);
 						client.data.gameStatus = "Player " + client.playerID 
@@ -131,14 +153,21 @@ public class Connect4Client extends Application {
 							client.updatePlayerID(Integer.parseInt(data.gameStatus.substring(18, 19)));
 							for (int i = 0; i < 6; i++){
 								for (int j = 0; j < 7; j++){
-									//Button btn = (Button) connect4Board.getChildren().get(i*7+j);
-									//btn.setDisable(true);
 									connect4Board.getChildren().get(i*7+j).setDisable(true);
 								}
 							}
 						}
 						else{
 							System.out.println("[Connect4Client] Error setting player ID");
+						}
+						
+						if(data.gameStatus.substring(0,6).equals("Player")){
+							client.updatePlayerID(Integer.parseInt(data.gameStatus.substring(18, 19)));
+							for (int i = 0; i < 6; i++){
+								for (int j = 0; j < 7; j++){
+									connect4Board.getChildren().get(i*7+j).setDisable(true);
+								}
+							}
 						}
 						
 						// If other player has disconnected, disable player's board
@@ -160,6 +189,20 @@ public class Connect4Client extends Application {
 				});
 				client.configureClient(ipInput.getText(), portSpinner.getValue());
 				client.start();
+			}
+		});
+		
+		restartBtn.setOnAction(new EventHandler<ActionEvent>(){
+			@Override public void handle(ActionEvent e){
+				client.end();
+				primaryStage.setScene(welcomeScreen);
+			}
+		});
+		
+		quitBtn.setOnAction(new EventHandler<ActionEvent>(){
+			@Override public void handle(ActionEvent e){
+				Platform.exit();
+				System.exit(0);
 			}
 		});
 	}

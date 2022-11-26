@@ -56,6 +56,7 @@ public class Server{
 						ClientInstance c = new ClientInstance(mysocket.accept(), newPlayerID, true);
 						System.out.println("[Server] P" + newPlayerID + " has joined the game...");
 						data.gameStatus = "P" + newPlayerID + " has joined the game...";
+						printPlayerSlots(playerSlots);
 						callback.accept(data);
 						clients.add(c);
 						c.start();
@@ -115,10 +116,19 @@ public class Server{
 					CFourInfo temp = new CFourInfo();
 					temp.gameStatus = "Server full...";
 					out.writeObject(temp);
+					break;
 				}
 				// Let new player know what their ID is
 				data.gameStatus = "Your Player ID is " + count + ". Waiting for others to join...";
 				out.writeObject(data);
+				// Wait for a few seconds for player to read message
+				// Check if two players are in server, then start game
+				Thread.sleep(3000);
+				if(playerSlots.size() == 0){
+					data.gameStatus = "Go Player " + clients.get(0).count + ". You start first!";
+					data.playerTurn = clients.get(0).count;
+					out.writeObject(data);
+				}
 			}
 			catch(Exception e){
 				System.out.println("[ClientThread] IO stream could not open...");
@@ -127,7 +137,6 @@ public class Server{
 				try{
 					CFourInfo temp = (CFourInfo) in.readObject();
 					callback.accept(temp);
-					// TODO: GAME LOGIC GOES HERE
 					updateClients(data);
 				}
 				catch(Exception e){

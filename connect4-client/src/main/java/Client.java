@@ -52,6 +52,14 @@ public class Client extends Thread{
 			}
 		}
 		catch(Exception e){
+			try{
+				data.gameStatus = "Error: Could not connect to server...";
+				callback.accept(data);
+				Thread.sleep(3000);
+			}
+			catch(Exception f){
+				System.out.println("Broken code...");
+			}
 			System.out.println("[Client] Could not connect to server / Socket issues...");
 			System.exit(0);
 		}
@@ -65,5 +73,9 @@ public class Client extends Thread{
 		catch(Exception e){
 			System.out.println("[Client] Could not send data...");
 		}
+	}
+	
+	public void end(){
+		System.exit(0);
 	}
 }
