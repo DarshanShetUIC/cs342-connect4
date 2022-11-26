@@ -126,10 +126,12 @@ public class Connect4Client extends Application {
 								if(client.playerID == 1){
 									client.data.gameStatus = "Waiting for P2 to make a move...";
 									moveInfo.setText(client.data.gameStatus);
+									playerTurn.setText("2");
 								}
 								else{
 									client.data.gameStatus = "Waiting for P1 to make a move...";
 									moveInfo.setText(client.data.gameStatus);
+									playerTurn.setText("1");
 								}
 							}
 						}, 1000);
