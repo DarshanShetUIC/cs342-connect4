@@ -6,8 +6,7 @@ import javafx.stage.*;
 import javafx.geometry.*;
 import javafx.event.*;
 import javafx.scene.image.*;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class Connect4Client extends Application {
 	
@@ -161,7 +160,25 @@ public class Connect4Client extends Application {
 							}
 						}
 						// If server is full, exit because this is Player 3
-						if(data.gameStatus.substring(0,6).equals("Server")){
+						else if(data.gameStatus.substring(0,6).equals("Server")){
+							moveInfo.setText(data.gameStatus);
+							for (int i = 0; i < 6; i++){
+								for (int j = 0; j < 7; j++){
+									connect4Board.getChildren().get(i*7+j).setDisable(true);
+								}
+							}
+							Timer timer = new Timer();
+							timer.schedule(new TimerTask(){
+								public void run()
+								{
+									Platform.exit();
+									System.exit(0);
+								}
+							}, 3000);
+						}
+						// If error, display error and quit after 3 seconds
+						// If server is full, exit because this is Player 3
+						else if(data.gameStatus.substring(0,6).equals("Error:")){
 							moveInfo.setText(data.gameStatus);
 							for (int i = 0; i < 6; i++){
 								for (int j = 0; j < 7; j++){

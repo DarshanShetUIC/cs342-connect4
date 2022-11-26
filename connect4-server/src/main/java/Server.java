@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.lang.Thread;
 import java.util.HashMap;
 import java.util.function.Consumer;
-import java.util.LinkedList;
+import java.util.*;
 
 public class Server{
 	
@@ -87,6 +87,19 @@ public class Server{
 					// Assign player ID to new player
 					data.gameStatus = "Your Player ID is " + id + ". Waiting for other players...";
 					out.writeObject(data);
+				}
+				
+				if(clients.size() == 2){
+					data.gameStatus = "2 players connected, P1 goes first...";
+					data.playerTurn = 1;
+					Timer timer = new Timer();
+					timer.schedule(new TimerTask(){
+						public void run()
+						{
+							callback.accept(data);
+							out.writeObject(data);
+						}
+					}, 1000);
 				}
 			}
 			catch(Exception e){

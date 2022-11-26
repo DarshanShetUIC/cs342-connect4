@@ -53,8 +53,9 @@ public class Client extends Thread{
 			}
 		}
 		catch(Exception e){
-			System.out.println("[Client] Could not connect to server / Socket issues...");
-			System.exit(0);
+			System.out.println("[Client] Could not connect to server / socket issues...");
+			data.gameStatus = "Error: Connection issues. Exiting...";
+			callback.accept(data);
 		}
 	}
 	
