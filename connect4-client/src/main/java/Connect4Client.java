@@ -28,7 +28,7 @@ public class Connect4Client extends Application {
 		portBox.setAlignment(Pos.CENTER);
 		portBox.setSpacing(5);
 		portBox.getChildren().addAll(portInfoLbl, portSpinner);
-		TextField ipInput = new TextField();
+		TextField ipInput = new TextField("127.0.0.1");
 		Label ipInputLbl = new Label("   IP:");
 		ipInputLbl.setStyle("-fx-text-fill: #ffffff;");
 		HBox ipBox = new HBox();
@@ -107,9 +107,19 @@ public class Connect4Client extends Application {
 						
 						
 						client.data.boardMatrix[button.r][button.c] = client.playerID;
-						client.data.gameStatus = "Player " + client.playerID 
+						client.data.gameStatus = "P " + client.playerID 
 							+ " made move at " + button.r + "," + button.c;
+						refreshGameBoardGUI(connect4Board, client.data);
 						//client.send();
+						if(client.playerID == 1){
+							client.data.gameStatus = "Waiting for P2 to make a move...";
+							moveInfo.setText(client.data.gameStatus);
+						}
+						else{
+							client.data.gameStatus = "Waiting for P1 to make a move...";
+							moveInfo.setText(client.data.gameStatus);
+						}
+						disableGameBoardGUI(connect4Board, true);
 					}
 				});
 				connect4Board.add(button, j, i);
@@ -155,21 +165,13 @@ public class Connect4Client extends Application {
 							System.out.println("[Connect4Client] Case 1");
 							client.updatePlayerID(Integer.parseInt(data.gameStatus.substring(18, 19)));
 							primaryStage.setTitle("Player " + Integer.toString(client.playerID));
-							for (int i = 0; i < 6; i++){
-								for (int j = 0; j < 7; j++){
-									connect4Board.getChildren().get(i*7+j).setDisable(true);
-								}
-							}
+							disableGameBoardGUI(connect4Board, true);
 						}
 						// If server is full, exit because this is Player 3
 						else if(data.gameStatus.substring(0,6).equals("Server")){
 							System.out.println("[Connect4Client] Case 2");
 							moveInfo.setText(data.gameStatus);
-							for (int i = 0; i < 6; i++){
-								for (int j = 0; j < 7; j++){
-									connect4Board.getChildren().get(i*7+j).setDisable(true);
-								}
-							}
+							disableGameBoardGUI(connect4Board, true);
 							Timer timer = new Timer();
 							timer.schedule(new TimerTask(){
 								public void run()
@@ -184,11 +186,7 @@ public class Connect4Client extends Application {
 						else if(data.gameStatus.substring(0,6).equals("Error:")){
 							System.out.println("[Connect4Client] Case 3");
 							moveInfo.setText(data.gameStatus);
-							for (int i = 0; i < 6; i++){
-								for (int j = 0; j < 7; j++){
-									connect4Board.getChildren().get(i*7+j).setDisable(true);
-								}
-							}
+							disableGameBoardGUI(connect4Board, true);
 							Timer timer = new Timer();
 							timer.schedule(new TimerTask(){
 								public void run()
@@ -204,17 +202,7 @@ public class Connect4Client extends Application {
 							moveInfo.setText(data.gameStatus);
 							playerTurn.setText(Integer.toString(data.playerTurn));
 							if(data.playerTurn == client.playerID){
-								for (int i = 0; i < 6; i++){
-									for (int j = 0; j < 7; j++){
-										if(data.boardMatrix[i][j] == -1){
-											connect4Board.getChildren().get(i*7+j).setDisable(true);
-										}
-										else if(data.boardMatrix[i][j] == 0){
-											connect4Board.getChildren().get(i*7+j).setDisable(false);
-										}									
-									}
-								}
-								
+								refreshGameBoardGUI(connect4Board, data);
 							}
 						}
 					});
@@ -237,6 +225,53 @@ public class Connect4Client extends Application {
 				System.exit(0);
 			}
 		});
+		
+		
+	}
+	
+	public void disableGameBoardGUI(GridPane connect4Board, boolean state){
+		for (int i = 0; i < 6; i++){
+			for (int j = 0; j < 7; j++){
+				connect4Board.getChildren().get(i*7+j).setDisable(state);
+			}
+		}
+	}
+	
+	public void refreshGameBoardGUI(GridPane connect4Board, CFourInfo data){
+		System.out.println("[Connect4Client] Refreshing GUI...");
+		GameButton temp;
+		for (int i = 0; i < 6; i++){
+			for (int j = 0; j < 7; j++){
+				if(data.boardMatrix[i][j] == 0){
+					temp = (GameButton) connect4Board.getChildren().get(i*7+j);
+					temp.setDisable(false);
+					temp.setPlayer(0);
+				}
+				else if(data.boardMatrix[i][j] == 1){
+					temp = (GameButton) connect4Board.getChildren().get(i*7+j);
+					temp.setDisable(false);
+					temp.setPlayer(1);
+				}
+				else if(data.boardMatrix[i][j] == 2){
+					temp = (GameButton) connect4Board.getChildren().get(i*7+j);
+					temp.setDisable(false);
+					temp.setPlayer(2);
+				}
+				else if(data.boardMatrix[i][j] == 10){
+					temp = (GameButton) connect4Board.getChildren().get(i*7+j);
+					temp.setDisable(false);
+					temp.setPlayer(10);
+				}
+				else if(data.boardMatrix[i][j] == 20){
+					temp = (GameButton) connect4Board.getChildren().get(i*7+j);
+					temp.setDisable(false);
+					temp.setPlayer(20);
+				}
+				else{
+					connect4Board.getChildren().get(i*7+j).setDisable(true);
+				}					
+			}
+		}
 	}
 	
 	@Override

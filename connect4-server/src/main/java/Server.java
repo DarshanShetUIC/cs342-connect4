@@ -9,7 +9,7 @@ import java.util.*;
 
 public class Server{
 	
-	int playerCount;
+	int newPlayerID;
 	HashMap<Integer, ClientInstance> clients = new HashMap<Integer, ClientInstance>();
 	
 	int port;
@@ -24,7 +24,7 @@ public class Server{
 	}
 	
 	public void createServerInstance(int input_port){
-		playerCount = 1;
+		newPlayerID = 1;
 		port = input_port;
 		data = new CFourInfo();
 		server = new ServerInstance();
@@ -42,15 +42,15 @@ public class Server{
 				
 				// Check if players joined game and allow them to connect. If full, reject.
 				while(true){
-					ClientInstance c = new ClientInstance(mysocket.accept(), playerCount);
-					System.out.println("[Server] P" + playerCount + " has joined the game...");
-					data.gameStatus = "P" + playerCount + " has joined the game...";
+					ClientInstance c = new ClientInstance(mysocket.accept(), newPlayerID);
+					System.out.println("[Server] P" + newPlayerID + " has joined the game...");
+					data.gameStatus = "P" + newPlayerID + " has joined the game...";
 					callback.accept(data);
-					clients.put(playerCount, c);
+					clients.put(newPlayerID, c);
 					System.out.println("[Server] Number of players: " + clients.size());
 					c.start();
-					playerCount++;
-					if(playerCount >= 4){playerCount = 3;}
+					newPlayerID++;
+					if(newPlayerID == 4){newPlayerID = 3;}
 				}
 			}
 			catch(Exception e){
@@ -130,7 +130,7 @@ public class Server{
 				catch(Exception e){
 					System.out.println("[Server] P" + id + " has left the server");
 					clients.remove(id);
-					playerCount = id;
+					newPlayerID = id;
 					data.gameStatus = "P" + id + " has left the server...";
 					callback.accept(data);
 					break;
