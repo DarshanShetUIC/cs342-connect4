@@ -49,6 +49,7 @@ public class Connect4Server extends Application {
 		// Show the intro screen first
 		primaryStage.setScene(serverControlsScene);
 		primaryStage.setTitle("Connect 4: Halo Server");
+		primaryStage.setResizable(false);
 		primaryStage.show();
 		
 		serverOnButton.setOnAction(new EventHandler<ActionEvent>(){

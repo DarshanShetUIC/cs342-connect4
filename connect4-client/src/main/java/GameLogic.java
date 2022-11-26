@@ -2,6 +2,21 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class GameLogic {
+
+	public static int[][] updateBoardMatrix(int[][] boardMatrix){
+		// Adjust board so next player can insert coin at that spot
+		// Useful for GUI clients rather than game itself
+		for(int i = 0; i < 5; i++){
+			for(int j = 0; j < 7; j++){
+				if(boardMatrix[i][j] == -1){
+					if(boardMatrix[i+1][j] == 1 || boardMatrix[i+1][j] == 2){
+						boardMatrix[i][j] = 0;
+					}
+				}
+			}
+		}
+		return boardMatrix;
+	}
 	
 	public static boolean win(CFourInfo data) {
 		// horizontalCheck 

@@ -106,10 +106,10 @@ public class Connect4Client extends Application {
 						// Send that info over to the server to pass on to other players
 						
 						
-						client.data.setCoinOnGameBoard(button.r, button.c, client.playerID);
+						client.data.boardMatrix[button.r][button.c] = client.playerID;
 						client.data.gameStatus = "Player " + client.playerID 
 							+ " made move at " + button.r + "," + button.c;
-						client.send();
+						//client.send();
 					}
 				});
 				connect4Board.add(button, j, i);
@@ -152,7 +152,9 @@ public class Connect4Client extends Application {
 						// Set player id of client once client connects to server
 						// Server determines player's ID
 						if(data.gameStatus.substring(0,4).equals("Your")){
+							System.out.println("[Connect4Client] Case 1");
 							client.updatePlayerID(Integer.parseInt(data.gameStatus.substring(18, 19)));
+							primaryStage.setTitle("Player " + Integer.toString(client.playerID));
 							for (int i = 0; i < 6; i++){
 								for (int j = 0; j < 7; j++){
 									connect4Board.getChildren().get(i*7+j).setDisable(true);
@@ -161,6 +163,7 @@ public class Connect4Client extends Application {
 						}
 						// If server is full, exit because this is Player 3
 						else if(data.gameStatus.substring(0,6).equals("Server")){
+							System.out.println("[Connect4Client] Case 2");
 							moveInfo.setText(data.gameStatus);
 							for (int i = 0; i < 6; i++){
 								for (int j = 0; j < 7; j++){
@@ -179,6 +182,7 @@ public class Connect4Client extends Application {
 						// If error, display error and quit after 3 seconds
 						// If server is full, exit because this is Player 3
 						else if(data.gameStatus.substring(0,6).equals("Error:")){
+							System.out.println("[Connect4Client] Case 3");
 							moveInfo.setText(data.gameStatus);
 							for (int i = 0; i < 6; i++){
 								for (int j = 0; j < 7; j++){
@@ -193,6 +197,25 @@ public class Connect4Client extends Application {
 									System.exit(0);
 								}
 							}, 3000);
+						}
+						// Determine if game has started
+						else if(data.gameStatus.substring(0,9).equals("2 players")){
+							System.out.println("[Connect4Client] Case 4");
+							moveInfo.setText(data.gameStatus);
+							playerTurn.setText(Integer.toString(data.playerTurn));
+							if(data.playerTurn == client.playerID){
+								for (int i = 0; i < 6; i++){
+									for (int j = 0; j < 7; j++){
+										if(data.boardMatrix[i][j] == -1){
+											connect4Board.getChildren().get(i*7+j).setDisable(true);
+										}
+										else if(data.boardMatrix[i][j] == 0){
+											connect4Board.getChildren().get(i*7+j).setDisable(false);
+										}									
+									}
+								}
+								
+							}
 						}
 					});
 				});

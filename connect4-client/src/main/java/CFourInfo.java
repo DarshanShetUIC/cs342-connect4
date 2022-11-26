@@ -38,29 +38,4 @@ public class CFourInfo implements Serializable{
 			boardMatrix[5][j] = 0;
 		}
 	}
-	
-	public void setCoinOnGameBoard(int row, int col, int coin){
-		boardMatrix[row][col] = coin;
-		lastChangedRow = row;
-		lastChangedCol = col;
-		refreshBoardMatrix();
-	}
-	
-	public int getCoinOnGameBoard(int row, int col){
-		return boardMatrix[row][col];
-	}
-	
-	public void refreshBoardMatrix(){
-		// Adjust board so next player can insert coin at that spot
-		// Useful for GUI clients rather than game itself
-		for(int i = 0; i < 5; i++){
-			for(int j = 0; j < 7; j++){
-				if(boardMatrix[i][j] == -1){
-					if(boardMatrix[i+1][j] == 1 || boardMatrix[i+1][j] == 2){
-						boardMatrix[i][j] = 0;
-					}
-				}
-			}
-		}
-	}
 }

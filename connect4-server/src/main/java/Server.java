@@ -90,17 +90,24 @@ public class Server{
 				}
 				
 				if(clients.size() == 2){
-					data.gameStatus = "2 players connected, P1 goes first...";
-					data.playerTurn = 1;
 					Timer timer = new Timer();
 					timer.schedule(new TimerTask(){
 						public void run()
 						{
-							callback.accept(data);
-							out.writeObject(data);
+							try{
+								CFourInfo temp = new CFourInfo();
+								temp.gameStatus = "2 players connected, P1 goes first...";
+								temp.playerTurn = 1;
+								callback.accept(temp);
+								updateClients(temp);
+							}
+							catch(Exception f){
+								System.out.println("[Server] Error starting game...");
+							}
 						}
 					}, 1000);
 				}
+				
 			}
 			catch(Exception e){
 				System.out.println("[Server] IO stream could not open...");
@@ -128,6 +135,16 @@ public class Server{
 					callback.accept(data);
 					break;
 				}
+			}
+		}
+		
+		public void updateClients(CFourInfo data){
+			try{
+				clients.get(1).out.writeObject(data);
+				clients.get(2).out.writeObject(data);
+			}
+			catch(Exception e){
+				System.out.println("[Server] Could not update clients...");
 			}
 		}
 	}
