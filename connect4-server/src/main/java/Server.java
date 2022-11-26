@@ -49,6 +49,7 @@ public class Server{
 				System.out.println("Server waiting for P1 and P2...");
 				data.gameStatus = "Server waiting for P1 and P2...";
 				callback.accept(data);
+				
 				// Check if players joined game and allow them to connect. If full, quietly reject.
 				while(true){
 					if(playerSlots.size() != 0){
@@ -56,19 +57,19 @@ public class Server{
 						ClientInstance c = new ClientInstance(mysocket.accept(), newPlayerID, true);
 						System.out.println("[Server] P" + newPlayerID + " has joined the game...");
 						data.gameStatus = "P" + newPlayerID + " has joined the game...";
-						printPlayerSlots(playerSlots);
 						callback.accept(data);
 						clients.add(c);
+						printPlayerSlots(playerSlots);
 						c.start();
 					}
 					else{
 						// Since two players are currently playing
 						// Allow the other player to connect but reject it later on
-						ClientInstance c = new ClientInstance(mysocket.accept(), 0, false);
+						ClientInstance c = new ClientInstance(mysocket.accept(), 3, false);
 						System.out.println("[Server] Another player connecting. Rejecting...");
 						data.gameStatus = "Another player connecting. Rejecting...";
 						callback.accept(data);
-						break;
+						c.start();
 					}
 				}
 			}
@@ -109,31 +110,26 @@ public class Server{
 				in = new ObjectInputStream(connection.getInputStream());
 				out = new ObjectOutputStream(connection.getOutputStream());
 				connection.setTcpNoDelay(true);
+				
 				// If server has two players already and a third one tries to join,
 				// connect with that third player but send it an info message
 				// stating server is full
-				if(!canJoin){
+				if(canJoin == false){
 					CFourInfo temp = new CFourInfo();
 					temp.gameStatus = "Server full...";
 					out.writeObject(temp);
-					break;
 				}
-				// Let new player know what their ID is
-				data.gameStatus = "Your Player ID is " + count + ". Waiting for others to join...";
-				out.writeObject(data);
-				// Wait for a few seconds for player to read message
-				// Check if two players are in server, then start game
-				Thread.sleep(3000);
-				if(playerSlots.size() == 0){
-					data.gameStatus = "Go Player " + clients.get(0).count + ". You start first!";
-					data.playerTurn = clients.get(0).count;
+				if(canJoin == true)
+				{
+					// Let new player know what their ID is
+					data.gameStatus = "Your Player ID is " + count + ". Waiting for others to join...";
 					out.writeObject(data);
 				}
 			}
 			catch(Exception e){
 				System.out.println("[ClientThread] IO stream could not open...");
 			}
-			while(true){
+			while(canJoin){
 				try{
 					CFourInfo temp = (CFourInfo) in.readObject();
 					callback.accept(temp);
@@ -147,7 +143,6 @@ public class Server{
 					data.gameStatus = "Error: P" + count + " has left the server...";
 					callback.accept(data);
 					updateClients(data);
-					break;
 				}
 			}
 		}

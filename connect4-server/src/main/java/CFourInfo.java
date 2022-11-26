@@ -16,6 +16,8 @@ public class CFourInfo implements Serializable{
 	// 0 for fillable spot
 	// 1 for P1 coin
 	// 2 for P2 coin
+	// 10 for P1 winning coin
+	// 20 for P2 winning coin
 	int boardMatrix[][];
 	// remember last move
 	int lastChangedRow;
@@ -41,6 +43,7 @@ public class CFourInfo implements Serializable{
 		boardMatrix[row][col] = coin;
 		lastChangedRow = row;
 		lastChangedCol = col;
+		refreshBoardMatrix();
 	}
 	
 	public int getCoinOnGameBoard(int row, int col){

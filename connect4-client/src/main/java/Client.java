@@ -45,17 +45,17 @@ public class Client extends Thread{
 			socket.setTcpNoDelay(true);
 			// read data from server and pass onto UI to update gameboard and other UI elements
 			while(true){
-				CFourInfo temp = (CFourInfo) in.readObject();
+				data = (CFourInfo) in.readObject();
 				System.out.println("[Client] Server sent a data packet");
-				data = temp;
-				callback.accept(temp);
+				//System.out.println(data.gameStatus);
+				callback.accept(data);
 			}
 		}
 		catch(Exception e){
 			try{
 				data.gameStatus = "Error: Could not connect to server...";
 				callback.accept(data);
-				Thread.sleep(3000);
+				//Thread.sleep(3000);
 			}
 			catch(Exception f){
 				System.out.println("Broken code...");

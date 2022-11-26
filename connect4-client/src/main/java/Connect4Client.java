@@ -157,9 +157,6 @@ public class Connect4Client extends Application {
 								}
 							}
 						}
-						else{
-							System.out.println("[Connect4Client] Error setting player ID");
-						}
 						
 						if(data.gameStatus.substring(0,6).equals("Player")){
 							client.updatePlayerID(Integer.parseInt(data.gameStatus.substring(18, 19)));
