@@ -109,8 +109,8 @@ public class Connect4Client extends Application {
 						client.data.boardMatrix[button.r][button.c] = client.playerID;
 						client.data.gameStatus = "P" + client.playerID 
 							+ " made move at " + button.r + "," + button.c;
-						//client.data.boardMatrix = GameLogic.updateBoardMatrix(client.data.boardMatrix);
 						refreshGameBoardGUI(connect4Board, client.data);
+						client.data.boardMatrix = GameLogic.updateBoardMatrix(client.data.boardMatrix);
 						if(client.playerID == 1){
 							client.data.playerTurn = 2;
 						}
