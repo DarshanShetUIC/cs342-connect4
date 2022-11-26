@@ -97,44 +97,58 @@ public class Connect4Client extends Application {
 				button.setOnAction(new EventHandler<ActionEvent>(){
 					@Override
 					public void handle(ActionEvent e){
-						// TODO: Update client's internal CFourInfo data object and then send to server
-						// Layman's terms:
-						// When a player presses a valid button on the game board,
-						// update the game board matrix, then update the game status.
-						// If the player wins the game logically, check for it,
-						// and mark the board, set the status.
-						// Send that info over to the server to pass on to other players
-						
-						
 						client.data.boardMatrix[button.r][button.c] = client.playerID;
 						client.data.gameStatus = "P" + client.playerID 
 							+ " made move at " + button.r + "," + button.c;
 						refreshGameBoardGUI(connect4Board, client.data);
 						client.data.boardMatrix = GameLogic.updateBoardMatrix(client.data.boardMatrix);
-						if(client.playerID == 1){
-							client.data.playerTurn = 2;
+						// TODO:
+						// 1. Check if current move caused player to win
+						// 2. Get a list of winning coordinates
+						// 3. Update gameboard with those coordinates
+						
+						if(false/*win(client.data)*/){
+							/*
+							for(each winning coordinate){
+								client.data.boardMatrix[button.r][button.c] = (client.playerID + 10);
+							}
+							refreshGameBoardGUI(connect4Board, client.data);
+							disableGameBoardGUI(connect4Board, true);
+							Timer timer = new Timer();
+							timer.schedule(new TimerTask(){
+								public void run()
+								{
+									primaryStage.setScene(endGameScreen);
+								}
+							}, 3000);
+							*/
 						}
 						else{
-							client.data.playerTurn = 1;
-						}
-						disableGameBoardGUI(connect4Board, true);
-						client.send();
-						Timer timer = new Timer();
-						timer.schedule(new TimerTask(){
-							public void run()
-							{
-								if(client.playerID == 1){
-									client.data.gameStatus = "Waiting for P2 to make a move...";
-									moveInfo.setText(client.data.gameStatus);
-									playerTurn.setText("2");
-								}
-								else{
-									client.data.gameStatus = "Waiting for P1 to make a move...";
-									moveInfo.setText(client.data.gameStatus);
-									playerTurn.setText("1");
-								}
+							if(client.playerID == 1){
+								client.data.playerTurn = 2;
 							}
-						}, 1000);
+							else{
+								client.data.playerTurn = 1;
+							}
+							disableGameBoardGUI(connect4Board, true);
+							client.send();
+							Timer timer = new Timer();
+							timer.schedule(new TimerTask(){
+								public void run()
+								{
+									if(client.playerID == 1){
+										client.data.gameStatus = "Waiting for P2 to make a move...";
+										moveInfo.setText(client.data.gameStatus);
+										playerTurn.setText("2");
+									}
+									else{
+										client.data.gameStatus = "Waiting for P1 to make a move...";
+										moveInfo.setText(client.data.gameStatus);
+										playerTurn.setText("1");
+									}
+								}
+							}, 1000);
+						}
 					}
 				});
 				connect4Board.add(button, j, i);
@@ -167,7 +181,7 @@ public class Connect4Client extends Application {
 				client = new Client(data -> {
 					// When response received from server, update the game board
 					Platform.runLater(() -> {
-						// TODO: CLIENT SIDE GAME LOGIC
+						// CLIENT SIDE GAME LOGIC
 						// Update client's game board with values received from server
 						// Also, enable or disable board depending on who is playing
 						
@@ -289,15 +303,15 @@ public class Connect4Client extends Application {
 					temp.setDisable(true);
 					temp.setPlayer(2);
 				}
-				else if(data.boardMatrix[i][j] == 10){
+				else if(data.boardMatrix[i][j] == 11){
 					temp = (GameButton) connect4Board.getChildren().get(i*7+j);
 					temp.setDisable(true);
-					temp.setPlayer(10);
+					temp.setPlayer(11);
 				}
-				else if(data.boardMatrix[i][j] == 20){
+				else if(data.boardMatrix[i][j] == 12){
 					temp = (GameButton) connect4Board.getChildren().get(i*7+j);
 					temp.setDisable(true);
-					temp.setPlayer(20);
+					temp.setPlayer(12);
 				}
 				else{
 					connect4Board.getChildren().get(i*7+j).setDisable(true);
