@@ -131,17 +131,32 @@ public class Server{
 					System.out.println("[Server] P" + id + " has left the server");
 					clients.remove(id);
 					newPlayerID = id;
-					data.gameStatus = "P" + id + " has left the server...";
-					callback.accept(data);
+					CFourInfo temp = new CFourInfo();
+					temp.gameStatus = "P" + id + " has left the server...";;
+					callback.accept(temp);
+					updateClients(temp);
+					System.out.println("[Server] Number of players: " + clients.size());
+					data.gameStatus = "Number of players: " + clients.size();
+					callback.accept(temp);
 					break;
 				}
 			}
 		}
 		
-		public void updateClients(CFourInfo data){
+		public void updateClients(CFourInfo msg){
 			try{
-				clients.get(1).out.writeObject(data);
-				clients.get(2).out.writeObject(data);
+				if(clients.size() == 2){
+					clients.get(1).out.writeObject(msg);
+					clients.get(2).out.writeObject(msg);
+				}
+				else if(clients.size() == 1){
+					if(clients.containsKey(2)){
+						clients.get(2).out.writeObject(msg);
+					}
+					else if(clients.containsKey(1)){
+						clients.get(1).out.writeObject(msg);
+					}
+				}
 			}
 			catch(Exception e){
 				System.out.println("[Server] Could not update clients...");
