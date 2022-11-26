@@ -33,7 +33,7 @@ public class Client extends Thread{
 		IP_Address = addy;
 		port = input_port;
 		data = new CFourInfo();
-		System.out.println("[Client] Client-->Server Connection: " + addy + ":" + input_port);
+		System.out.println("[Client] Configuring Client-->Server Connection: " + addy + ":" + input_port);
 	}
 	
 	public void run(){
@@ -43,23 +43,16 @@ public class Client extends Thread{
 			out = new ObjectOutputStream(socket.getOutputStream());
 			in = new ObjectInputStream(socket.getInputStream());
 			socket.setTcpNoDelay(true);
+			
 			// read data from server and pass onto UI to update gameboard and other UI elements
 			while(true){
 				data = (CFourInfo) in.readObject();
 				System.out.println("[Client] Server sent a data packet");
-				//System.out.println(data.gameStatus);
+				System.out.println("[Client] Message: " + data.gameStatus);
 				callback.accept(data);
 			}
 		}
 		catch(Exception e){
-			try{
-				data.gameStatus = "Error: Could not connect to server...";
-				callback.accept(data);
-				//Thread.sleep(3000);
-			}
-			catch(Exception f){
-				System.out.println("Broken code...");
-			}
 			System.out.println("[Client] Could not connect to server / Socket issues...");
 			System.exit(0);
 		}

@@ -3,14 +3,14 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.lang.Thread;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.LinkedList;
 
 public class Server{
 	
-	LinkedList<Integer> playerSlots = new LinkedList<Integer>();
-	ArrayList<ClientInstance> clients = new ArrayList<ClientInstance>();
+	int playerCount;
+	HashMap<Integer, ClientInstance> clients = new HashMap<Integer, ClientInstance>();
 	
 	int port;
 	ServerInstance server;
@@ -24,21 +24,11 @@ public class Server{
 	}
 	
 	public void createServerInstance(int input_port){
-		playerSlots.add(1);
-		playerSlots.add(2);
-		printPlayerSlots(playerSlots);
+		playerCount = 1;
 		port = input_port;
 		data = new CFourInfo();
 		server = new ServerInstance();
 		server.start();
-	}
-	
-	public void printPlayerSlots(LinkedList<Integer> list){
-		System.out.print("Slots available: ");
-		for(Integer slot : list){
-			System.out.print(slot + " ");
-		}
-		System.out.println("");
 	}
 	
 	public class ServerInstance extends Thread{
@@ -46,31 +36,21 @@ public class Server{
 			try{
 				// Create socket for players to connect to server
 				ServerSocket mysocket = new ServerSocket(port);
-				System.out.println("Server waiting for P1 and P2...");
+				System.out.println("[Server] Server waiting for P1 and P2...");
 				data.gameStatus = "Server waiting for P1 and P2...";
 				callback.accept(data);
 				
-				// Check if players joined game and allow them to connect. If full, quietly reject.
+				// Check if players joined game and allow them to connect. If full, reject.
 				while(true){
-					if(playerSlots.size() != 0){
-						int newPlayerID = playerSlots.remove();
-						ClientInstance c = new ClientInstance(mysocket.accept(), newPlayerID, true);
-						System.out.println("[Server] P" + newPlayerID + " has joined the game...");
-						data.gameStatus = "P" + newPlayerID + " has joined the game...";
-						callback.accept(data);
-						clients.add(c);
-						printPlayerSlots(playerSlots);
-						c.start();
-					}
-					else{
-						// Since two players are currently playing
-						// Allow the other player to connect but reject it later on
-						ClientInstance c = new ClientInstance(mysocket.accept(), 3, false);
-						System.out.println("[Server] Another player connecting. Rejecting...");
-						data.gameStatus = "Another player connecting. Rejecting...";
-						callback.accept(data);
-						c.start();
-					}
+					ClientInstance c = new ClientInstance(mysocket.accept(), playerCount);
+					System.out.println("[Server] P" + playerCount + " has joined the game...");
+					data.gameStatus = "P" + playerCount + " has joined the game...";
+					callback.accept(data);
+					clients.put(playerCount, c);
+					System.out.println("[Server] Number of players: " + clients.size());
+					c.start();
+					playerCount++;
+					if(playerCount >= 4){playerCount = 3;}
 				}
 			}
 			catch(Exception e){
@@ -81,28 +61,14 @@ public class Server{
 	
 	public class ClientInstance extends Thread{
 		
+		int id;
 		Socket connection;
-		int count;
 		ObjectInputStream in;
 		ObjectOutputStream out;
-		boolean canJoin;
 		
-		ClientInstance(Socket s, int count, boolean joinable){
+		ClientInstance(Socket s, int id){
 			this.connection = s;
-			this.count = count;	
-			canJoin = joinable;
-		}
-		
-		public void updateClients(CFourInfo data){ // update the board, heavy changes
-			for(int i = 0; i < clients.size(); i++) {
-				ClientInstance t = clients.get(i);
-				try{
-					t.out.writeObject(data);
-				}
-				catch(Exception e){
-					System.out.println("[ClientThread] Could not update clients...");
-				}
-			}
+			this.id = id;
 		}
 		
 		public void run(){
@@ -111,38 +77,43 @@ public class Server{
 				out = new ObjectOutputStream(connection.getOutputStream());
 				connection.setTcpNoDelay(true);
 				
-				// If server has two players already and a third one tries to join,
-				// connect with that third player but send it an info message
-				// stating server is full
-				if(canJoin == false){
-					CFourInfo temp = new CFourInfo();
-					temp.gameStatus = "Server full...";
-					out.writeObject(temp);
+				
+				if(clients.size() >= 3){
+					data.gameStatus = "Server is full. P3 will be kicked out...";
+					callback.accept(data);
+					out.writeObject(data);
 				}
-				if(canJoin == true)
-				{
-					// Let new player know what their ID is
-					data.gameStatus = "Your Player ID is " + count + ". Waiting for others to join...";
+				else{
+					// Assign player ID to new player
+					data.gameStatus = "Your Player ID is " + id + ". Waiting for other players...";
 					out.writeObject(data);
 				}
 			}
 			catch(Exception e){
-				System.out.println("[ClientThread] IO stream could not open...");
+				System.out.println("[Server] IO stream could not open...");
 			}
-			while(canJoin){
+			while(true){
 				try{
-					CFourInfo temp = (CFourInfo) in.readObject();
-					callback.accept(temp);
-					updateClients(data);
+					data = (CFourInfo) in.readObject();
+					callback.accept(data);
+					if(id == 1){
+						if(clients.containsKey(2)){
+							clients.get(2).out.writeObject(data);
+						}
+					}
+					else if(id == 2){
+						if(clients.containsKey(1)){
+							clients.get(1).out.writeObject(data);
+						}
+					}
 				}
 				catch(Exception e){
-					System.out.println("[ClientThread] A client has left the server");
-					clients.remove(this);
-					playerSlots.add(count);
-					printPlayerSlots(playerSlots);
-					data.gameStatus = "Error: P" + count + " has left the server...";
+					System.out.println("[Server] P" + id + " has left the server");
+					clients.remove(id);
+					playerCount = id;
+					data.gameStatus = "P" + id + " has left the server...";
 					callback.accept(data);
-					updateClients(data);
+					break;
 				}
 			}
 		}

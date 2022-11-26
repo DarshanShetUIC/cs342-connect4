@@ -6,6 +6,8 @@ import javafx.stage.*;
 import javafx.geometry.*;
 import javafx.event.*;
 import javafx.scene.image.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Connect4Client extends Application {
 	
@@ -130,6 +132,7 @@ public class Connect4Client extends Application {
 		
 		
 		
+		
 		connectToServer.setOnAction(new EventHandler<ActionEvent>(){
 			@Override
 			public void handle(ActionEvent e){
@@ -157,30 +160,22 @@ public class Connect4Client extends Application {
 								}
 							}
 						}
-						
-						if(data.gameStatus.substring(0,6).equals("Player")){
-							client.updatePlayerID(Integer.parseInt(data.gameStatus.substring(18, 19)));
-							for (int i = 0; i < 6; i++){
-								for (int j = 0; j < 7; j++){
-									connect4Board.getChildren().get(i*7+j).setDisable(true);
-								}
-							}
-						}
-						
-						// If other player has disconnected, disable player's board
-						// Server will send a message about this
-						if(data.gameStatus.substring(0,6).equals("Error:")){
-							for (int i = 0; i < 6; i++){
-								for (int j = 0; j < 7; j++){
-									connect4Board.getChildren().get(i*7+j).setDisable(true);
-								}
-							}
-						}
-						
 						// If server is full, exit because this is Player 3
 						if(data.gameStatus.substring(0,6).equals("Server")){
-							Platform.exit();
-							System.exit(0);
+							moveInfo.setText(data.gameStatus);
+							for (int i = 0; i < 6; i++){
+								for (int j = 0; j < 7; j++){
+									connect4Board.getChildren().get(i*7+j).setDisable(true);
+								}
+							}
+							Timer timer = new Timer();
+							timer.schedule(new TimerTask(){
+								public void run()
+								{
+									Platform.exit();
+									System.exit(0);
+								}
+							}, 3000);
 						}
 					});
 				});
