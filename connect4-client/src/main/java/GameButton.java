@@ -33,8 +33,8 @@ public class GameButton extends Button{
 		this.player = player;
 		if(player == 1){this.setGraphic(new ImageView(img1));}
 		else if(player == 2){this.setGraphic(new ImageView(img2));}
-		else if(player == 10){this.setGraphic(new ImageView(img3));}
-		else if(player == 20){this.setGraphic(new ImageView(img4));}
+		else if(player == 11){this.setGraphic(new ImageView(img3));}
+		else if(player == 12){this.setGraphic(new ImageView(img4));}
 		else{this.setGraphic(new ImageView(img0));}
 	}
 }

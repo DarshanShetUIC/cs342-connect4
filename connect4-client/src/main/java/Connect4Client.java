@@ -7,6 +7,7 @@ import javafx.geometry.*;
 import javafx.event.*;
 import javafx.scene.image.*;
 import java.util.*;
+import java.io.*;
 
 public class Connect4Client extends Application {
 	
@@ -18,7 +19,7 @@ public class Connect4Client extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-	
+		
 		// Welcome screen for client
 		Spinner<Integer> portSpinner = new Spinner<Integer>(1024,49151,5555);
 		portSpinner.setEditable(true);
@@ -97,31 +98,76 @@ public class Connect4Client extends Application {
 				button.setOnAction(new EventHandler<ActionEvent>(){
 					@Override
 					public void handle(ActionEvent e){
-						client.data.boardMatrix[button.r][button.c] = client.playerID;
-						client.data.gameStatus = "P" + client.playerID 
-							+ " made move at " + button.r + "," + button.c;
-						refreshGameBoardGUI(connect4Board, client.data);
-						client.data.boardMatrix = GameLogic.updateBoardMatrix(client.data.boardMatrix);
-						// TODO:
-						// 1. Check if current move caused player to win
-						// 2. Get a list of winning coordinates
-						// 3. Update gameboard with those coordinates
+						/*****************************************************
+							START OF GAME LOGIC PART ONE
+						*****************************************************/
 						
-						if(false/*win(client.data)*/){
-							/*
-							for(each winning coordinate){
-								client.data.boardMatrix[button.r][button.c] = (client.playerID + 10);
-							}
+						// Add player input to gameboard and update board
+						client.data.lastChangedRow = button.r;
+						client.data.lastChangedCol = button.c;
+						client.data.boardMatrix[button.r][button.c] = client.playerID;
+						client.data.boardMatrix = GameLogic.updateBoardMatrix(client.data.boardMatrix);
+						
+						// Check if move is a win
+						// If win, send to client about it
+						
+						if(GameLogic.checkTie(client.data)){
+							
+							client.data.playerTurn = 0;
+							client.data.gameStatus = "P"+client.playerID+" made move at "
+								+button.r+","+button.c+". Tie between P1 and P2";
+							client.data.gameInProgress = false;
+							client.send();
+							
+							moveInfo.setText(client.data.gameStatus);
+							playerTurn.setText("0");
 							refreshGameBoardGUI(connect4Board, client.data);
 							disableGameBoardGUI(connect4Board, true);
+							System.out.println("[Connect4Client] Switching to end screen for P" 
+								+ client.playerID);
 							Timer timer = new Timer();
 							timer.schedule(new TimerTask(){
 								public void run()
 								{
-									primaryStage.setScene(endGameScreen);
+									Platform.runLater(() -> {
+										endOfGameLbl.setText("P1 P2 Tie");
+										primaryStage.setScene(endGameScreen);
+									});
 								}
 							}, 3000);
-							*/
+						}
+						
+						else if(GameLogic.checkWin(client.data)){
+							
+							/* GET WIN COORDINATES HERE */
+							
+							client.data.playerTurn = 0;
+							client.data.gameStatus = "P"+client.playerID+" made move at "
+								+button.r+","+button.c+". P" + client.playerID + " wins...";
+							client.data.gameInProgress = false;
+							client.send();
+							
+							moveInfo.setText(client.data.gameStatus);
+							playerTurn.setText("0");
+							refreshGameBoardGUI(connect4Board, client.data);
+							disableGameBoardGUI(connect4Board, true);
+							System.out.println("[Connect4Client] Switching to end screen for P" 
+								+ client.playerID);
+							Timer timer = new Timer();
+							timer.schedule(new TimerTask(){
+								public void run()
+								{
+									Platform.runLater(() -> {
+										if(client.playerID == 1){
+											endOfGameLbl.setText("P1 Wins");
+										}
+										else{
+											endOfGameLbl.setText("P2 Wins");
+										}
+										primaryStage.setScene(endGameScreen);
+									});
+								}
+							}, 3000);
 						}
 						else{
 							if(client.playerID == 1){
@@ -130,25 +176,18 @@ public class Connect4Client extends Application {
 							else{
 								client.data.playerTurn = 1;
 							}
-							disableGameBoardGUI(connect4Board, true);
+							client.data.gameStatus = "P"+client.playerID+" made move at "
+								+button.r+","+button.c+". Waiting for P"+client.data.playerTurn+"...";
+							client.data.gameInProgress = true;
 							client.send();
-							Timer timer = new Timer();
-							timer.schedule(new TimerTask(){
-								public void run()
-								{
-									if(client.playerID == 1){
-										client.data.gameStatus = "Waiting for P2 to make a move...";
-										moveInfo.setText(client.data.gameStatus);
-										playerTurn.setText("2");
-									}
-									else{
-										client.data.gameStatus = "Waiting for P1 to make a move...";
-										moveInfo.setText(client.data.gameStatus);
-										playerTurn.setText("1");
-									}
-								}
-							}, 1000);
+							moveInfo.setText(client.data.gameStatus);
+							playerTurn.setText(Integer.toString(client.data.playerTurn));
+							refreshGameBoardGUI(connect4Board, client.data);
+							disableGameBoardGUI(connect4Board, true);
 						}
+						/*****************************************************
+							END OF GAME LOGIC PART ONE
+						*****************************************************/
 					}
 				});
 				connect4Board.add(button, j, i);
@@ -181,24 +220,24 @@ public class Connect4Client extends Application {
 				client = new Client(data -> {
 					// When response received from server, update the game board
 					Platform.runLater(() -> {
-						// CLIENT SIDE GAME LOGIC
-						// Update client's game board with values received from server
-						// Also, enable or disable board depending on who is playing
-						
-						// Display message sent by server / other players
-						moveInfo.setText(data.gameStatus);
-						playerTurn.setText(Integer.toString(data.playerTurn));
-						// Set player id of client once client connects to server
+						/*****************************************************
+							START OF GAME LOGIC PART TWO
+						*****************************************************/
+						// Set player id once client connects to server
 						// Server determines player's ID
 						if(data.gameStatus.substring(0,4).equals("Your")){
 							System.out.println("[Connect4Client] Case 1");
-							client.updatePlayerID(Integer.parseInt(data.gameStatus.substring(18, 19)));
+							client.updatePlayerID(Integer.parseInt(data.gameStatus.substring(18,19)));
 							primaryStage.setTitle("Player " + Integer.toString(client.playerID));
+							moveInfo.setText(data.gameStatus);
+							playerTurn.setText("0");
 							disableGameBoardGUI(connect4Board, true);
 						}
 						// If server is full, exit because this is Player 3
 						else if(data.gameStatus.substring(0,6).equals("Server")){
 							System.out.println("[Connect4Client] Case 2");
+							moveInfo.setText(data.gameStatus);
+							playerTurn.setText("0");
 							disableGameBoardGUI(connect4Board, true);
 							Timer timer = new Timer();
 							timer.schedule(new TimerTask(){
@@ -209,10 +248,11 @@ public class Connect4Client extends Application {
 								}
 							}, 3000);
 						}
-						// If error, display error and quit after 3 seconds
-						// If server is full, exit because this is Player 3
+						// If connection error, display error and quit after 3 seconds
 						else if(data.gameStatus.substring(0,6).equals("Error:")){
 							System.out.println("[Connect4Client] Case 3");
+							moveInfo.setText(data.gameStatus);
+							playerTurn.setText("0");
 							disableGameBoardGUI(connect4Board, true);
 							Timer timer = new Timer();
 							timer.schedule(new TimerTask(){
@@ -226,31 +266,98 @@ public class Connect4Client extends Application {
 						// Determine if game has started
 						else if(data.gameStatus.substring(0,9).equals("2 players")){
 							System.out.println("[Connect4Client] Case 4");
+							moveInfo.setText(data.gameStatus);
+							data.gameInProgress = true;
 							playerTurn.setText(Integer.toString(data.playerTurn));
 							if(data.playerTurn == client.playerID){
 								refreshGameBoardGUI(connect4Board, data);
 							}
 						}
 						// Received players move
-						else if(data.gameStatus.substring(0,1).equals("P") && data.gameStatus.substring(3,7).equals("made")){
+						else if(data.gameStatus.substring(0,1).equals("P") 
+							&& data.gameStatus.substring(3,7).equals("made")
+							&& data.gameInProgress == true){
 							System.out.println("[Connect4Client] Case 5");
+							moveInfo.setText(data.gameStatus);
+							playerTurn.setText(Integer.toString(data.playerTurn));
 							if(data.playerTurn == client.playerID){
 								refreshGameBoardGUI(connect4Board, data);
 							}
 						}
 						// Received players move
-						else if(data.gameStatus.substring(0,1).equals("P") && data.gameStatus.substring(3,6).equals("has")){
+						else if(data.gameStatus.substring(0,1).equals("P") 
+							&& data.gameStatus.substring(21,24).equals("Tie")
+							&& data.gameInProgress == false){
+							System.out.println("[Connect4Client] Case 8");
+							moveInfo.setText(data.gameStatus);
+							playerTurn.setText("0");
+							refreshGameBoardGUI(connect4Board, data);
+							disableGameBoardGUI(connect4Board, true);
+							System.out.println("[Connect4Client] Switching to end screen for P" 
+								+ client.playerID);
+							Timer timer = new Timer();
+							timer.schedule(new TimerTask(){
+								public void run()
+								{
+									Platform.runLater(() -> {
+										endOfGameLbl.setText("P1 P2 Tie");
+										primaryStage.setScene(endGameScreen);
+									});
+								}
+							}, 3000);
+						}
+						// If another player left the server
+						// Server will notify this player
+						// With no game to play, this player will quit
+						else if(data.gameStatus.substring(0,1).equals("P") 
+							&& data.gameStatus.substring(3,5).equals("has")
+							&& data.gameInProgress == false){
 							System.out.println("[Connect4Client] Case 6");
+							moveInfo.setText(data.gameStatus.substring(0,22)+"...");
+							playerTurn.setText("0");
 							disableGameBoardGUI(connect4Board, true);
 							Timer timer = new Timer();
 							timer.schedule(new TimerTask(){
 								public void run()
 								{
-									Platform.exit();
-									System.exit(0);
+									Platform.runLater(() -> {
+										endOfGameLbl.setText("Game Ended");
+										primaryStage.setScene(endGameScreen);
+									});
 								}
 							}, 3000);
 						}
+						// If other player wins, stop game and disable board
+						// Show winning coins and switch to end game screen after 3 seconds
+						else if(data.gameStatus.substring(0,1).equals("P")
+							&& data.gameStatus.substring(24,28).equals("wins")
+							&& data.gameInProgress == false){
+							System.out.println("[Connect4Client] Case 7");
+							moveInfo.setText(data.gameStatus);
+							playerTurn.setText(Integer.toString(data.playerTurn));
+							refreshGameBoardGUI(connect4Board, data);
+							disableGameBoardGUI(connect4Board, true);
+							System.out.println("[Connect4Client] Switching to end screen for P" 
+								+ client.playerID);
+							Timer timer = new Timer();
+							timer.schedule(new TimerTask(){
+								public void run()
+								{
+									Platform.runLater(() -> {
+										if(client.playerID == 1){
+											endOfGameLbl.setText("P2 Wins");
+										}
+										else{
+											endOfGameLbl.setText("P1 Wins");
+										}
+										primaryStage.setScene(endGameScreen);
+									});
+								}
+							}, 3000);
+						}
+						/*****************************************************
+							END OF GAME LOGIC PART TWO
+						*****************************************************/
 					});
 				});
 				client.configureClient(ipInput.getText(), portSpinner.getValue());
@@ -260,8 +367,14 @@ public class Connect4Client extends Application {
 		
 		restartBtn.setOnAction(new EventHandler<ActionEvent>(){
 			@Override public void handle(ActionEvent e){
-				client.end();
-				primaryStage.setScene(welcomeScreen);
+				try{
+					Process runtime = Runtime.getRuntime().exec("mvn exec:java");
+				}
+				catch(Exception f){
+					System.out.println("[Connect4Client] Could not restart...");
+				}
+				Platform.exit();
+				System.exit(0);
 			}
 		});
 		
@@ -291,6 +404,11 @@ public class Connect4Client extends Application {
 				if(data.boardMatrix[i][j] == 0){
 					temp = (GameButton) connect4Board.getChildren().get(i*7+j);
 					temp.setDisable(false);
+					temp.setPlayer(0);
+				}
+				else if(data.boardMatrix[i][j] == -1){
+					temp = (GameButton) connect4Board.getChildren().get(i*7+j);
+					temp.setDisable(true);
 					temp.setPlayer(0);
 				}
 				else if(data.boardMatrix[i][j] == 1){

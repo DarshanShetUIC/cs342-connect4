@@ -18,6 +18,8 @@ public class Client extends Thread{
 	
 	int playerID;
 	
+	boolean stayConnected;
+	
 	private Consumer<CFourInfo> callback;
 	
 	public Client(Consumer<CFourInfo> call){
@@ -32,6 +34,7 @@ public class Client extends Thread{
 	public void configureClient(String addy, int input_port){
 		IP_Address = addy;
 		port = input_port;
+		stayConnected = true;
 		data = new CFourInfo();
 		System.out.println("[Client] Configuring Client-->Server Connection: " + addy + ":" + input_port);
 	}
@@ -45,7 +48,7 @@ public class Client extends Thread{
 			socket.setTcpNoDelay(true);
 			
 			// read data from server and pass onto UI to update gameboard and other UI elements
-			while(true){
+			while(stayConnected){
 				data = (CFourInfo) in.readObject();
 				System.out.println("[Client] Server sent a data packet");
 				System.out.println("[Client] Message: " + data.gameStatus);
@@ -53,9 +56,15 @@ public class Client extends Thread{
 			}
 		}
 		catch(Exception e){
-			System.out.println("[Client] Could not connect to server / socket issues...");
-			data.gameStatus = "Error: Connection issues. Exiting...";
-			callback.accept(data);
+			if(stayConnected){
+				System.out.println("[Client] Could not connect to server / socket issues...");
+				System.out.println("[Client] Data classes in server/client may be incompatible...");
+				data.gameStatus = "Error: Connection issues. Exiting...";
+				callback.accept(data);
+			}
+			else{
+				System.out.println("[Client] Ending this client instance...");
+			}
 		}
 	}
 	
@@ -67,9 +76,5 @@ public class Client extends Thread{
 		catch(Exception e){
 			System.out.println("[Client] Could not send data...");
 		}
-	}
-	
-	public void end(){
-		System.exit(0);
 	}
 }

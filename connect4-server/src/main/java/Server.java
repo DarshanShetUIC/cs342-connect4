@@ -55,6 +55,7 @@ public class Server{
 			}
 			catch(Exception e){
 				System.out.println("[Server] Socket failed...");
+				System.exit(0);
 			}
 		}
 	}
@@ -98,6 +99,7 @@ public class Server{
 								CFourInfo temp = new CFourInfo();
 								temp.gameStatus = "2 players connected, P1 goes first...";
 								temp.playerTurn = 1;
+								temp.gameInProgress = true;
 								callback.accept(temp);
 								updateClients(temp);
 							}
@@ -116,6 +118,10 @@ public class Server{
 				try{
 					data = (CFourInfo) in.readObject();
 					callback.accept(data);
+					if(data.gameStatus.substring(3,11).equals("will quit")){
+						clients.remove(id);
+						break;
+					}
 					if(id == 1){
 						if(clients.containsKey(2)){
 							clients.get(2).out.writeObject(data);
@@ -130,14 +136,14 @@ public class Server{
 				catch(Exception e){
 					System.out.println("[Server] P" + id + " has left the server");
 					clients.remove(id);
-					newPlayerID = id;
+					newPlayerID = 1;
 					CFourInfo temp = new CFourInfo();
 					temp.gameStatus = "P" + id + " has left the server...";;
 					callback.accept(temp);
 					updateClients(temp);
 					System.out.println("[Server] Number of players: " + clients.size());
 					data.gameStatus = "Number of players: " + clients.size();
-					callback.accept(temp);
+					callback.accept(data);
 					break;
 				}
 			}

@@ -30,20 +30,8 @@ public class GameLogic {
 		return boardMatrix;
 	}
 	
-	public static boolean checkTie(CFourInfo data){
-		if(data.boardMatrix[5][3] == 2 &&
-			data.boardMatrix[5][4] == 2 &&
-			data.boardMatrix[5][5] == 2 &&
-			data.boardMatrix[5][6] == 2 &&
-			data.boardMatrix[2][0] == 1 &&
-			data.boardMatrix[3][0] == 1 &&
-			data.boardMatrix[4][0] == 1 &&
-			data.boardMatrix[5][0] == 1){return true;}
-		return false;
-	}
-	
 	public static boolean checkWin(CFourInfo data) {
-		// P1 or P2 example win
+		// P1 example win
 		if(data.boardMatrix[2][6] == 2 &&
 			data.boardMatrix[3][6] == 2 &&
 			data.boardMatrix[4][6] == 2 &&
