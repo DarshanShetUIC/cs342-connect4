@@ -1,5 +1,6 @@
 import java.io.FileNotFoundException;
 import java.util.*;
+import javafx.util.*;
 
 public class GameLogic {
 
@@ -31,14 +32,14 @@ public class GameLogic {
 	}
 	
 	public static boolean checkTie(CFourInfo data){
-		if(data.boardMatrix[5][3] == 2 &&
-			data.boardMatrix[5][4] == 2 &&
-			data.boardMatrix[5][5] == 2 &&
-			data.boardMatrix[5][6] == 2 &&
-			data.boardMatrix[2][0] == 1 &&
-			data.boardMatrix[3][0] == 1 &&
-			data.boardMatrix[4][0] == 1 &&
-			data.boardMatrix[5][0] == 1){return true;}
+		if(data.boardMatrix[2][3] == 2 &&
+			data.boardMatrix[3][3] == 2 &&
+			data.boardMatrix[4][3] == 2 &&
+			data.boardMatrix[5][3] == 2 &&
+			data.boardMatrix[2][4] == 1 &&
+			data.boardMatrix[3][4] == 1 &&
+			data.boardMatrix[4][4] == 1 &&
+			data.boardMatrix[5][4] == 1){return true;}
 		return false;
 	}
 	
@@ -48,10 +49,15 @@ public class GameLogic {
 			data.boardMatrix[3][6] == 2 &&
 			data.boardMatrix[4][6] == 2 &&
 			data.boardMatrix[5][6] == 2){return true;}
-		if(data.boardMatrix[5][0] == 1 &&
-			data.boardMatrix[5][1] == 1 &&
-			data.boardMatrix[5][2] == 1 &&
-			data.boardMatrix[5][3] == 1){return true;}
+		if(data.boardMatrix[2][0] == 1 &&
+			data.boardMatrix[3][0] == 1 &&
+			data.boardMatrix[4][0] == 1 &&
+			data.boardMatrix[5][0] == 1){return true;}
 		return false;
+	}
+	
+	public static ArrayList<Pair<Integer, Integer>> getWinningCoordinates(CFourInfo data){
+		int winningPlayer = data.boardMatrix[data.lastChangedRow][data.lastChangedCol];
+		return null;
 	}
 }

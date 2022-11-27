@@ -6,6 +6,7 @@ import javafx.stage.*;
 import javafx.geometry.*;
 import javafx.event.*;
 import javafx.scene.image.*;
+import javafx.util.*;
 import java.util.*;
 import java.io.*;
 
@@ -310,8 +311,7 @@ public class Connect4Client extends Application {
 						// Server will notify this player
 						// With no game to play, this player will quit
 						else if(data.gameStatus.substring(0,1).equals("P") 
-							&& data.gameStatus.substring(3,5).equals("has")
-							&& data.gameInProgress == false){
+							&& data.gameStatus.substring(3,6).equals("has")){
 							System.out.println("[Connect4Client] Case 6");
 							moveInfo.setText(data.gameStatus.substring(0,22)+"...");
 							playerTurn.setText("0");
