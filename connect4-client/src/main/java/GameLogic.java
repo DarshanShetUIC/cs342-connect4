@@ -43,26 +43,83 @@ public class GameLogic {
 		return false;
 	}
 	
-	public static boolean checkWin(CFourInfo data) {
-		// P1 or P2 example win
-		if(data.boardMatrix[2][6] == 2 &&
-			data.boardMatrix[3][6] == 2 &&
-			data.boardMatrix[4][6] == 2 &&
-			data.boardMatrix[5][6] == 2){return true;}
-		if(data.boardMatrix[2][0] == 1 &&
-			data.boardMatrix[3][0] == 1 &&
-			data.boardMatrix[4][0] == 1 &&
-			data.boardMatrix[5][0] == 1){return true;}
+	public static boolean checkWin(CFourInfo data)
+	{	
+		final int HEIGHT = 6;
+		final int WIDTH = 7;
+		int PLAYER = data.boardMatrix[data.lastChangedRow][data.lastChangedCol];
+		
+		// Check for horizontal win
+		for (int r = 0; r < HEIGHT; r++)
+		{
+			for (int c = 0; c < 4; c++)
+			{
+				if(data.boardMatrix[r][c+0] == PLAYER
+				&& data.boardMatrix[r][c+1] == PLAYER
+				&& data.boardMatrix[r][c+2] == PLAYER
+				&& data.boardMatrix[r][c+3] == PLAYER){return true;}
+			}
+		}
+		
+		// Check for vertical win
+		for (int c = 0; c < WIDTH; c++)
+		{
+			for (int r = 0; r < 3; r++)
+			{
+				if(data.boardMatrix[r+0][c] == PLAYER
+				&& data.boardMatrix[r+1][c] == PLAYER
+				&& data.boardMatrix[r+1][c] == PLAYER
+				&& data.boardMatrix[r+3][c] == PLAYER){return true;}
+			}
+		}
+		
+		// 
+		
 		return false;
 	}
 	
 	public static ArrayList<Pair<Integer, Integer>> getWinningCoordinates(CFourInfo data){
-		int winningPlayer = data.boardMatrix[data.lastChangedRow][data.lastChangedCol];
 		ArrayList<Pair<Integer, Integer>> res = new ArrayList<Pair<Integer, Integer>>();
-		res.add(new Pair<>(0,2));
-		res.add(new Pair<>(0,3));
-		res.add(new Pair<>(0,4));
-		res.add(new Pair<>(0,5));
+		final int HEIGHT = 6;
+		final int WIDTH = 7;
+		int PLAYER = data.boardMatrix[data.lastChangedRow][data.lastChangedCol];
+		
+		// Check for horizontal win
+		for (int r = 0; r < HEIGHT; r++)
+		{
+			for (int c = 0; c < 4; c++)
+			{
+				if(data.boardMatrix[r][c+0] == PLAYER
+				&& data.boardMatrix[r][c+1] == PLAYER
+				&& data.boardMatrix[r][c+2] == PLAYER
+				&& data.boardMatrix[r][c+3] == PLAYER)
+				{
+					res.add(new Pair<>(r,c+0));
+					res.add(new Pair<>(r,c+1));
+					res.add(new Pair<>(r,c+2));
+					res.add(new Pair<>(r,c+3));
+				}
+			}
+		}
+		
+		// Check for vertical win
+		for (int c = 0; c < WIDTH; c++)
+		{
+			for (int r = 0; r < 3; r++)
+			{
+				if(data.boardMatrix[r+0][c] == PLAYER
+				&& data.boardMatrix[r+1][c] == PLAYER
+				&& data.boardMatrix[r+1][c] == PLAYER
+				&& data.boardMatrix[r+3][c] == PLAYER)
+				{
+					res.add(new Pair<>(r+0,c));
+					res.add(new Pair<>(r+1,c));
+					res.add(new Pair<>(r+2,c));
+					res.add(new Pair<>(r+3,c));
+				}
+			}
+		}
+		
 		return res;
 	}
 }
