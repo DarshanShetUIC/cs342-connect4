@@ -32,15 +32,17 @@ public class GameLogic {
 	}
 	
 	public static boolean checkTie(CFourInfo data){
-		if(data.boardMatrix[2][3] == 2 &&
-			data.boardMatrix[3][3] == 2 &&
-			data.boardMatrix[4][3] == 2 &&
-			data.boardMatrix[5][3] == 2 &&
-			data.boardMatrix[2][4] == 1 &&
-			data.boardMatrix[3][4] == 1 &&
-			data.boardMatrix[4][4] == 1 &&
-			data.boardMatrix[5][4] == 1){return true;}
-		return false;
+		final int HEIGHT = 6;
+		final int WIDTH = 7;
+		for (int r = 0; r < HEIGHT; r++)
+		{
+			for (int c = 0; c < WIDTH; c++)
+			{
+				if(data.boardMatrix[r][c] == -1
+				|| data.boardMatrix[r][c] == 0){return false;}
+			}
+		}
+		return true;
 	}
 	
 	public static boolean checkWin(CFourInfo data)
@@ -73,7 +75,29 @@ public class GameLogic {
 			}
 		}
 		
-		// 
+		// Check for right diagonal win
+		for (int c = 0; c <= 3; c++)
+		{ 
+			for (int r = 3; r < HEIGHT; r++)
+			{
+				if(data.boardMatrix[r][c] == PLAYER
+				&& data.boardMatrix[r-1][c+1] == PLAYER
+				&& data.boardMatrix[r-2][c+2] == PLAYER
+				&& data.boardMatrix[r-3][c+3] == PLAYER){return true;}
+			}
+		}
+		
+		// Check for left diagonal win
+		for (int c = 3; c < WIDTH; c++)
+		{ 
+			for (int r = 3; r < HEIGHT; r++)
+			{
+				if(data.boardMatrix[r][c] == PLAYER
+				&& data.boardMatrix[r-1][c-1] == PLAYER
+				&& data.boardMatrix[r-2][c-2] == PLAYER
+				&& data.boardMatrix[r-3][c-3] == PLAYER){return true;}
+			}
+		}
 		
 		return false;
 	}
@@ -98,6 +122,7 @@ public class GameLogic {
 					res.add(new Pair<>(r,c+1));
 					res.add(new Pair<>(r,c+2));
 					res.add(new Pair<>(r,c+3));
+					return res;
 				}
 			}
 		}
@@ -116,6 +141,45 @@ public class GameLogic {
 					res.add(new Pair<>(r+1,c));
 					res.add(new Pair<>(r+2,c));
 					res.add(new Pair<>(r+3,c));
+					return res;
+				}
+			}
+		}
+		
+		// Check for right diagonal win
+		for (int c = 0; c <= 3; c++)
+		{ 
+			for (int r = 3; r < HEIGHT; r++)
+			{
+				if(data.boardMatrix[r][c] == PLAYER
+				&& data.boardMatrix[r-1][c+1] == PLAYER
+				&& data.boardMatrix[r-2][c+2] == PLAYER
+				&& data.boardMatrix[r-3][c+3] == PLAYER)
+				{
+					res.add(new Pair<>(r,c));
+					res.add(new Pair<>(r-1,c+1));
+					res.add(new Pair<>(r-2,c+2));
+					res.add(new Pair<>(r-3,c+3));
+					return res;
+				}
+			}
+		}
+		
+		// Check for left diagonal win
+		for (int c = 3; c < WIDTH; c++)
+		{ 
+			for (int r = 3; r < HEIGHT; r++)
+			{
+				if(data.boardMatrix[r][c] == PLAYER
+				&& data.boardMatrix[r-1][c-1] == PLAYER
+				&& data.boardMatrix[r-2][c-2] == PLAYER
+				&& data.boardMatrix[r-3][c-3] == PLAYER)
+				{
+					res.add(new Pair<>(r,c));
+					res.add(new Pair<>(r-1,c-1));
+					res.add(new Pair<>(r-2,c-2));
+					res.add(new Pair<>(r-3,c-3));
+					return res;
 				}
 			}
 		}
