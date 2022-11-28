@@ -140,7 +140,11 @@ public class Connect4Client extends Application {
 						
 						else if(GameLogic.checkWin(client.data)){
 							
-							/* GET WIN COORDINATES HERE */
+							ArrayList<Pair<Integer, Integer>> res = GameLogic.getWinningCoordinates(client.data);
+							for(Pair<Integer, Integer> x : res){
+								System.out.println("[Connect4Client] Win: " + x.getKey() + "," + x.getValue());
+								client.data.boardMatrix[x.getKey()][x.getValue()] = (client.playerID + 10);
+							}
 							
 							client.data.playerTurn = 0;
 							client.data.gameStatus = "P"+client.playerID+" made move at "

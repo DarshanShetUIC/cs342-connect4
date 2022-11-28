@@ -58,6 +58,11 @@ public class GameLogic {
 	
 	public static ArrayList<Pair<Integer, Integer>> getWinningCoordinates(CFourInfo data){
 		int winningPlayer = data.boardMatrix[data.lastChangedRow][data.lastChangedCol];
-		return null;
+		ArrayList<Pair<Integer, Integer>> res = new ArrayList<Pair<Integer, Integer>>();
+		res.add(new Pair<>(0,2));
+		res.add(new Pair<>(0,3));
+		res.add(new Pair<>(0,4));
+		res.add(new Pair<>(0,5));
+		return res;
 	}
 }
