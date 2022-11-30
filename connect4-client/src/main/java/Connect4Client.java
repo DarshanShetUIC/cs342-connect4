@@ -372,7 +372,18 @@ public class Connect4Client extends Application {
 		restartBtn.setOnAction(new EventHandler<ActionEvent>(){
 			@Override public void handle(ActionEvent e){
 				try{
-					Process runtime = Runtime.getRuntime().exec("mvn exec:java");
+					String thisOS = System.getProperty("os.name");
+					if(thisOS.substring(0,5).equals("Linux")){
+						System.out.println("HERE B");
+						Process runtime = Runtime.getRuntime().exec("mvn exec:java");
+					}
+					else if(thisOS.substring(0,7).equals("Windows")){
+						System.out.println("HERE A");
+						Process runtime = Runtime.getRuntime().exec("runClient.bat");
+					}
+					else{
+						System.out.println(thisOS + " not supported...");
+					}
 				}
 				catch(Exception f){
 					System.out.println("[Connect4Client] Could not restart...");
