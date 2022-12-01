@@ -56,7 +56,7 @@ public class GameLogic {
 		{
 			for (int c = 0; c < 4; c++)
 			{
-				if(data.boardMatrix[r][c+0] == PLAYER
+				if(data.boardMatrix[r][c] == PLAYER
 				&& data.boardMatrix[r][c+1] == PLAYER
 				&& data.boardMatrix[r][c+2] == PLAYER
 				&& data.boardMatrix[r][c+3] == PLAYER){return true;}
@@ -68,7 +68,7 @@ public class GameLogic {
 		{
 			for (int r = 0; r < 3; r++)
 			{
-				if(data.boardMatrix[r+0][c] == PLAYER
+				if(data.boardMatrix[r][c] == PLAYER
 				&& data.boardMatrix[r+1][c] == PLAYER
 				&& data.boardMatrix[r+1][c] == PLAYER
 				&& data.boardMatrix[r+3][c] == PLAYER){return true;}
